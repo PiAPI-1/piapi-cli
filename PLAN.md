@@ -251,19 +251,20 @@ piapi-cli/
 | 16 | 文档 | `skill/SKILL.md`、`AGENTS.md`、`README.md`、`README_CN.md` | SKILL.md 对齐 mmx 的 frontmatter 格式 |
 | 17 | build & 冒烟 | `dist/piapi.mjs` | typecheck/lint/build 全 pass；下方验收命令全通过 |
 
-### v1 模型 catalog（实际已发布，89 entries，分两条 API 通路）
+### v1 模型 catalog（实际已发布，94 entries，分两条 API 通路）
 
 `piapi model list` 是单一可信源。下面只列出分类规模和典型代表名。每条目都
 带 `// docs:` 注释 + `verified: true`。
 
 **Unified task API**（`POST /api/v1/task`，X-API-Key，async lifecycle）：
 
-- **image**（28）: flux 全家（dev / schnell / dev-advanced / img2img / kontext /
+- **image**（30）: flux 全家（dev / schnell / dev-advanced / img2img / kontext /
   inpaint / outpaint / redux）, midjourney + 9 个子动作（mj-upscale /
   mj-variation / mj-reroll / mj-describe / mj-seed / mj-blend / mj-inpaint /
   mj-outpaint / mj-pan）, gemini 系（nano-banana-pro / nano-banana-2 /
   gemini-2.5-flash-image）, qwen-image / qwen-image-edit, z-image,
-  seedream-5-lite, image tools（remove-bg / upscale / segment / joycaption）
+  seedream-5-lite, image tools（remove-bg / upscale / segment / joycaption /
+  faceswap / multi-faceswap）
 - **video**（35，all async）: sora2 系（sora2 / sora2-pro / sora2-watermark）,
   veo3 系（veo3 / veo3-fast / veo3.1 / veo3.1-fast）, kling 系（kling-3 /
   kling-3-omni / kling-o1 / kling-tryon / kling-effects / kling-sound /
@@ -272,7 +273,7 @@ piapi-cli/
   wan 系（wan2.6 / wan2.6-img2vid / wanx-lora / wanx-lora-img2vid /
   wanx-keyframe / wanx-camera / wanx22 / wanx22-img2vid）, seedance 系
   （seedance-2 / seedance-2-preview / seedance-watermark）, video tools
-  （video-upscale / video-remove-bg）
+  （video-upscale / video-remove-bg / video-faceswap）
 - **audio**（10）: udio 系（udio-music / udio-song-extend / udio-lyrics）,
   ace-step 系（ace-step / ace-step-audio2audio / ace-step-edit /
   ace-step-extend）, mmaudio, diffrhythm, f5-tts
@@ -283,14 +284,16 @@ piapi-cli/
 - **image**（3）: `gpt-image-2` / `gpt-image-1.5` / `gpt-image-1` → `/v1/images/generations`
 - **llm**（8）: `gpt-5` / `gpt-5.2` / `gpt-4o` / `gpt-4o-mini` / `gpt-4.1` /
   `claude-opus-4.6` / `claude-sonnet-4.6` / `gemini-2.5-flash` → `/v1/chat/completions`
+- **video**（2，强制 SSE streaming）: `sora2-preview` / `sora2-hd-preview` →
+  `/v1/chat/completions` with `stream: true`. CLI 用 async generator 解析
+  SSE，chunk 实时写 stdout，结束后从 markdown 抽出所有 URL。
 
-每条目 `{ name, type, model, taskType?, provider, apiType?, asyncOnly?, defaultInput?, verified? }`。`apiType` 缺省 `'unified'`；`taskType` 仅 unified 路径需要。
+每条目 `{ name, type, model, taskType?, provider, apiType?, asyncOnly?, streamingOnly?, defaultInput?, verified? }`。`apiType` 缺省 `'unified'`；`taskType` 仅 unified 路径需要；`streamingOnly` 仅 openai-completions 路径有效。
 
-**Round B（待办）**：
-- `sora2-preview` / `sora2-hd-preview` 用 `/v1/chat/completions` + 强制 SSE
-  streaming 模式；当前 `chatCompletion` 不支持 streaming 解析，加进来需要
-  扩 OpenAI-compat client。
-- Faceswap / 多媒体编辑系列若需 multipart 上传则属 Round B。
+**Round B（剩余）**：
+- Suno 已被 PiAPI 标记 service stopped，跳过。
+- 若未来 PiAPI 推出 multipart-only 端点（目前 faceswap 都用 image URL JSON
+  body，不需要），再补 multipart 客户端。
 
 ## 8. 验收标准（DoD）
 

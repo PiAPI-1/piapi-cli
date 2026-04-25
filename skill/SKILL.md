@@ -65,7 +65,7 @@ piapi run flux-dev prompt="test" --dry-run
 | `--out-dir <path>` | Download outputs to directory |
 | `--download` | Auto-download when task completes |
 
-**Models** (89 entries, every one verified against PiAPI docs).
+**Models** (94 entries, every one verified against PiAPI docs).
 For the full live list, run `piapi model list` — the catalog is the
 source of truth. Highlights below:
 
@@ -74,7 +74,7 @@ source of truth. Highlights below:
   `flux-outpaint`, `flux-redux`, `midjourney`, `mj-{upscale,variation,reroll,describe,seed,blend,inpaint,outpaint,pan}`,
   `nano-banana-pro`, `nano-banana-2`, `gemini-2.5-flash-image`,
   `qwen-image`, `qwen-image-edit`, `z-image`, `seedream-5-lite`
-- **Image tools** (unified): `remove-bg`, `upscale`, `segment`, `joycaption`
+- **Image tools** (unified): `remove-bg`, `upscale`, `segment`, `joycaption`, `faceswap`, `multi-faceswap`
 - **Image generation** (OpenAI-compat): `gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`
 - **Video** (all async unified): `sora2`, `sora2-pro`, `sora2-watermark`,
   `veo3`, `veo3-fast`, `veo3.1`, `veo3.1-fast`,
@@ -85,7 +85,8 @@ source of truth. Highlights below:
   `wan2.6`, `wan2.6-img2vid`, `wanx-lora`, `wanx-lora-img2vid`,
   `wanx-keyframe`, `wanx-camera`, `wanx22`, `wanx22-img2vid`,
   `seedance-2`, `seedance-2-preview`, `seedance-watermark`
-- **Video tools** (async unified): `video-upscale`, `video-remove-bg`
+- **Video tools** (async unified): `video-upscale`, `video-remove-bg`, `video-faceswap`
+- **Video** (OpenAI-compat streaming): `sora2-preview`, `sora2-hd-preview` — emits markdown progress + final video URL via SSE; the CLI streams chunks to stdout and prints `url: …` lines at the end
 - **Audio** (unified): `udio-music`, `udio-song-extend`, `udio-lyrics`,
   `ace-step`, `ace-step-audio2audio`, `ace-step-edit`, `ace-step-extend`,
   `mmaudio`, `diffrhythm`, `f5-tts`
