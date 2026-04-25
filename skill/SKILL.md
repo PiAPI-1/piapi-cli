@@ -1,6 +1,6 @@
 ---
 name: piapi-cli
-description: Use piapi to call 80+ multimodal AI models (flux, sora2, kling, midjourney, veo3, hailuo, suno, trellis, etc.) via the PiAPI unified API. Use when the user wants to generate images, videos, audio, 3D models, or text completions from the terminal. Supports key=value inputs, async tasks, polling, and webhook callbacks.
+description: Use piapi to call 89 multimodal AI models — image (flux/midjourney/qwen/nano-banana/seedream/z-image/gpt-image), video (sora2/veo3/kling/hailuo/wan/seedance/skyreels/framepack/hunyuan/luma/omni-human/ai-hug), audio (udio/ace-step/mmaudio/diffrhythm/f5-tts), 3D (trellis), LLM (gpt/claude/gemini) — from the terminal. Auto-routes between PiAPI's unified task API and OpenAI-compatible endpoints. Supports key=value inputs, async tasks, polling, and webhook callbacks.
 ---
 
 # PiAPI CLI — Agent Skill Guide
@@ -65,14 +65,33 @@ piapi run flux-dev prompt="test" --dry-run
 | `--out-dir <path>` | Download outputs to directory |
 | `--download` | Auto-download when task completes |
 
-**Models** (every entry verified against PiAPI docs):
+**Models** (89 entries, every one verified against PiAPI docs).
+For the full live list, run `piapi model list` — the catalog is the
+source of truth. Highlights below:
 
-- **Image** (unified): `flux-dev`, `flux-schnell`, `flux-dev-advanced`, `midjourney`, `nano-banana-pro`, `nano-banana-2`, `gemini-2.5-flash-image`, `qwen-image`, `seedream-5-lite`
-- **Image** (OpenAI-compat): `gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`
-- **Video** (all async unified): `sora2`, `sora2-pro`, `veo3`, `veo3.1`, `kling-3`, `kling-3-omni`, `kling-o1`, `hailuo`, `wan2.6`, `seedance-2`
-- **Audio** (unified): `udio-music`, `ace-step`, `mmaudio`, `diffrhythm`, `f5-tts`
+- **Image generation** (unified): `flux-dev`, `flux-schnell`,
+  `flux-dev-advanced`, `flux-img2img`, `flux-kontext`, `flux-inpaint`,
+  `flux-outpaint`, `flux-redux`, `midjourney`, `mj-{upscale,variation,reroll,describe,seed,blend,inpaint,outpaint,pan}`,
+  `nano-banana-pro`, `nano-banana-2`, `gemini-2.5-flash-image`,
+  `qwen-image`, `qwen-image-edit`, `z-image`, `seedream-5-lite`
+- **Image tools** (unified): `remove-bg`, `upscale`, `segment`, `joycaption`
+- **Image generation** (OpenAI-compat): `gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`
+- **Video** (all async unified): `sora2`, `sora2-pro`, `sora2-watermark`,
+  `veo3`, `veo3-fast`, `veo3.1`, `veo3.1-fast`,
+  `kling-3`, `kling-3-omni`, `kling-o1`, `kling-tryon`, `kling-effects`,
+  `kling-sound`, `kling-avatar`, `kling-motion`, `kling-turbo`, `kling-elements`,
+  `hailuo`, `skyreels`, `framepack`, `hunyuan-video`, `luma`,
+  `omni-human`, `ai-hug-video`,
+  `wan2.6`, `wan2.6-img2vid`, `wanx-lora`, `wanx-lora-img2vid`,
+  `wanx-keyframe`, `wanx-camera`, `wanx22`, `wanx22-img2vid`,
+  `seedance-2`, `seedance-2-preview`, `seedance-watermark`
+- **Video tools** (async unified): `video-upscale`, `video-remove-bg`
+- **Audio** (unified): `udio-music`, `udio-song-extend`, `udio-lyrics`,
+  `ace-step`, `ace-step-audio2audio`, `ace-step-edit`, `ace-step-extend`,
+  `mmaudio`, `diffrhythm`, `f5-tts`
 - **3D** (async unified): `trellis`, `trellis2`
-- **LLM** (OpenAI-compat): `gpt-5`, `gpt-5.2`, `gpt-4o`, `gpt-4o-mini`, `gpt-4.1`, `claude-opus-4.6`, `claude-sonnet-4.6`, `gemini-2.5-flash`
+- **LLM** (OpenAI-compat): `gpt-5`, `gpt-5.2`, `gpt-4o`, `gpt-4o-mini`,
+  `gpt-4.1`, `claude-opus-4.6`, `claude-sonnet-4.6`, `gemini-2.5-flash`
 
 ### piapi task list
 

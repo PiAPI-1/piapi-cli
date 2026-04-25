@@ -1,6 +1,6 @@
 # PiAPI CLI
 
-Official CLI for the PiAPI platform — call 80+ multimodal AI models (image, video, audio, 3D, LLM) from your terminal or AI agent.
+Official CLI for the PiAPI platform — call 89 multimodal AI models (image, video, audio, 3D, LLM) from your terminal or AI agent. Every model is verified against PiAPI docs; `piapi model list` shows the live catalog.
 
 ## Install
 

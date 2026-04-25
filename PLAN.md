@@ -251,21 +251,46 @@ piapi-cli/
 | 16 | 文档 | `skill/SKILL.md`、`AGENTS.md`、`README.md`、`README_CN.md` | SKILL.md 对齐 mmx 的 frontmatter 格式 |
 | 17 | build & 冒烟 | `dist/piapi.mjs` | typecheck/lint/build 全 pass；下方验收命令全通过 |
 
-### v1 模型 catalog（实际已发布，分两条 API 通路）
+### v1 模型 catalog（实际已发布，89 entries，分两条 API 通路）
+
+`piapi model list` 是单一可信源。下面只列出分类规模和典型代表名。每条目都
+带 `// docs:` 注释 + `verified: true`。
 
 **Unified task API**（`POST /api/v1/task`，X-API-Key，async lifecycle）：
 
-- **image**: `flux-dev` / `flux-schnell` / `flux-dev-advanced` / `midjourney` / `nano-banana-pro` / `nano-banana-2` / `gemini-2.5-flash-image` / `qwen-image` / `seedream-5-lite`
-- **video**（all async）: `sora2` / `sora2-pro` / `veo3` / `veo3.1` / `kling-3` / `kling-3-omni` / `kling-o1` / `hailuo` / `wan2.6` / `seedance-2`
-- **audio**: `udio-music` / `ace-step` / `mmaudio` / `diffrhythm` / `f5-tts`
-- **3d**（async）: `trellis` / `trellis2`
+- **image**（28）: flux 全家（dev / schnell / dev-advanced / img2img / kontext /
+  inpaint / outpaint / redux）, midjourney + 9 个子动作（mj-upscale /
+  mj-variation / mj-reroll / mj-describe / mj-seed / mj-blend / mj-inpaint /
+  mj-outpaint / mj-pan）, gemini 系（nano-banana-pro / nano-banana-2 /
+  gemini-2.5-flash-image）, qwen-image / qwen-image-edit, z-image,
+  seedream-5-lite, image tools（remove-bg / upscale / segment / joycaption）
+- **video**（35，all async）: sora2 系（sora2 / sora2-pro / sora2-watermark）,
+  veo3 系（veo3 / veo3-fast / veo3.1 / veo3.1-fast）, kling 系（kling-3 /
+  kling-3-omni / kling-o1 / kling-tryon / kling-effects / kling-sound /
+  kling-avatar / kling-motion / kling-turbo / kling-elements）, hailuo,
+  skyreels, framepack, hunyuan-video, luma, omni-human, ai-hug-video,
+  wan 系（wan2.6 / wan2.6-img2vid / wanx-lora / wanx-lora-img2vid /
+  wanx-keyframe / wanx-camera / wanx22 / wanx22-img2vid）, seedance 系
+  （seedance-2 / seedance-2-preview / seedance-watermark）, video tools
+  （video-upscale / video-remove-bg）
+- **audio**（10）: udio 系（udio-music / udio-song-extend / udio-lyrics）,
+  ace-step 系（ace-step / ace-step-audio2audio / ace-step-edit /
+  ace-step-extend）, mmaudio, diffrhythm, f5-tts
+- **3d**（2，async）: trellis / trellis2
 
 **OpenAI-compatible API**（Bearer auth，sync，no envelope）：
 
-- **image**: `gpt-image-2` / `gpt-image-1.5` / `gpt-image-1` → `/v1/images/generations`
-- **llm**: `gpt-5` / `gpt-5.2` / `gpt-4o` / `gpt-4o-mini` / `gpt-4.1` / `claude-opus-4.6` / `claude-sonnet-4.6` / `gemini-2.5-flash` → `/v1/chat/completions`
+- **image**（3）: `gpt-image-2` / `gpt-image-1.5` / `gpt-image-1` → `/v1/images/generations`
+- **llm**（8）: `gpt-5` / `gpt-5.2` / `gpt-4o` / `gpt-4o-mini` / `gpt-4.1` /
+  `claude-opus-4.6` / `claude-sonnet-4.6` / `gemini-2.5-flash` → `/v1/chat/completions`
 
-每条目 `{ name, type, model, taskType?, provider, apiType?, asyncOnly?, defaultInput?, verified? }`。`apiType` 缺省 `'unified'`；`taskType` 仅 unified 路径需要。所有条目都通过 `verified: true` 标记，`// docs:` 注释指向 piapi 文档源。
+每条目 `{ name, type, model, taskType?, provider, apiType?, asyncOnly?, defaultInput?, verified? }`。`apiType` 缺省 `'unified'`；`taskType` 仅 unified 路径需要。
+
+**Round B（待办）**：
+- `sora2-preview` / `sora2-hd-preview` 用 `/v1/chat/completions` + 强制 SSE
+  streaming 模式；当前 `chatCompletion` 不支持 streaming 解析，加进来需要
+  扩 OpenAI-compat client。
+- Faceswap / 多媒体编辑系列若需 multipart 上传则属 Round B。
 
 ## 8. 验收标准（DoD）
 
