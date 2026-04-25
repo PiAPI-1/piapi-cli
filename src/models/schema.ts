@@ -20,11 +20,6 @@ export function getModelSchema(modelName: string): Record<string, unknown> | nul
       num_inference_steps: { type: 'number', default: 25, description: 'Inference steps' },
       guidance_scale: { type: 'number', default: 7.5, description: 'Guidance scale' },
     },
-    'flux-pro': {
-      prompt: { type: 'string', required: true, description: 'Text prompt' },
-      aspect_ratio: { type: 'string', default: '1:1' },
-      num_outputs: { type: 'number', default: 1 },
-    },
     'midjourney': {
       prompt: { type: 'string', required: true, description: 'Text prompt' },
       aspect_ratio: { type: 'string', default: '1:1' },

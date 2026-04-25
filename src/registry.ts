@@ -2,6 +2,7 @@ import type { CommandSpec } from './types/commands';
 import { CLIError } from './errors/base';
 import { ExitCode } from './errors/codes';
 import { ANSI, colorEnabled } from './output/color';
+import { GLOBAL_OPTIONS } from './command';
 
 interface CommandNode {
   command?: CommandSpec;
@@ -122,22 +123,12 @@ ${b('Resources:')}
   ${a('model')}      ${d('Model discovery (list, schema)')}
 
 ${b('Global Flags:')}
-  ${a('--api-key <key>')}        ${d('API key (overrides env/config)')}
-  ${a('--base-url <url>')}       ${d('API base URL')}
-  ${a('--output <format>')}      ${d('Output format: json, text')}
-  ${a('--quiet')}                ${d('Suppress progress indicators')}
-  ${a('--no-color')}             ${d('Disable ANSI colors and spinner')}
-  ${a('--non-interactive')}      ${d('Fail when input is needed')}
-  ${a('--async')}                ${d('Return task ID without polling')}
-  ${a('--dry-run')}              ${d('Show request without executing')}
-  ${a('--webhook <url>')}        ${d('Webhook URL for callbacks')}
-  ${a('--out-dir <path>')}       ${d('Output directory for downloads')}
-  ${a('--download')}             ${d('Auto-download outputs')}
-  ${a('--version')}              ${d('Print version')}
-  ${a('--help')}                 ${d('Show help')}
-
-${d(`Run "piapi help <command>" for command-specific help.`)}
 `);
+    const max = Math.max(...GLOBAL_OPTIONS.map(o => o.flag.length));
+    for (const opt of GLOBAL_OPTIONS) {
+      out.write(`  ${a(opt.flag.padEnd(max))}  ${d(opt.description)}\n`);
+    }
+    out.write(`\n${d(`Run "piapi help <command>" for command-specific help.`)}\n`);
   }
 
   private printCommand(cmd: CommandSpec, out: NodeJS.WriteStream): void {

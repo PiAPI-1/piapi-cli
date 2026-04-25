@@ -19,17 +19,25 @@ export default defineCommand({
 
     if (formatter === 'json') {
       process.stdout.write(formatJSON(models) + '\n');
-    } else {
-      const byType: Record<string, typeof models> = {};
-      for (const m of models) {
-        if (!byType[m.type]) byType[m.type] = [];
-        byType[m.type].push(m);
-      }
-      for (const [type, list] of Object.entries(byType)) {
-        process.stdout.write(`\n${type.toUpperCase()}:\n`);
-        for (const m of list) {
-          process.stdout.write(`  ${m.name.padEnd(25)} ${m.provider}${m.asyncOnly ? ' (async)' : ''}\n`);
-        }
+      return;
+    }
+
+    if (models.length === 0) {
+      process.stderr.write(
+        `No models match --type ${typeFilter}. Valid types: image, video, audio, 3d, llm.\n`,
+      );
+      return;
+    }
+
+    const byType: Record<string, typeof models> = {};
+    for (const m of models) {
+      if (!byType[m.type]) byType[m.type] = [];
+      byType[m.type].push(m);
+    }
+    for (const [type, list] of Object.entries(byType)) {
+      process.stdout.write(`\n${type.toUpperCase()}:\n`);
+      for (const m of list) {
+        process.stdout.write(`  ${m.name.padEnd(25)} ${m.provider}${m.asyncOnly ? ' (async)' : ''}\n`);
       }
     }
   },

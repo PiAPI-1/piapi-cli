@@ -220,8 +220,12 @@ async function runOpenAIChatStream(
     }
   }
 
+  // PiAPI's streamed completions sometimes ship an empty {} usage chunk.
+  // Treat usage as present only if at least total_tokens looks like a number.
+  const hasUsage = typeof usage?.total_tokens === 'number';
+
   if (formatter === 'json') {
-    process.stdout.write(formatJSON({ content: accumulated, usage }) + '\n');
+    process.stdout.write(formatJSON({ content: accumulated, usage: hasUsage ? usage : undefined }) + '\n');
     return;
   }
 
@@ -239,7 +243,7 @@ async function runOpenAIChatStream(
     for (const url of urls) process.stdout.write(`url: ${url}\n`);
   }
 
-  if (usage) {
+  if (hasUsage && usage) {
     process.stderr.write(
       `Usage: ${usage.total_tokens} tokens (in ${usage.prompt_tokens}, out ${usage.completion_tokens})\n`,
     );
