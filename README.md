@@ -167,7 +167,7 @@ Precedence: CLI flags → environment variables → config file → defaults.
 For Claude Code, Cursor, and other agents:
 
 ```bash
-npx skills add piapi-ai/cli
+npx skills add legnext-ai/piapi-cli
 ```
 
 See [`skill/SKILL.md`](skill/SKILL.md) for the full agent skill specification.

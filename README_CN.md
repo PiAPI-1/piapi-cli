@@ -167,7 +167,7 @@ piapi quota
 适用于 Claude Code、Cursor 等 Agent：
 
 ```bash
-npx skills add piapi-ai/cli
+npx skills add legnext-ai/piapi-cli
 ```
 
 完整 Agent Skill 规范见 [`skill/SKILL.md`](skill/SKILL.md)。
