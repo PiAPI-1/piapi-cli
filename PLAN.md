@@ -251,15 +251,21 @@ piapi-cli/
 | 16 | 文档 | `skill/SKILL.md`、`AGENTS.md`、`README.md`、`README_CN.md` | SKILL.md 对齐 mmx 的 frontmatter 格式 |
 | 17 | build & 冒烟 | `dist/piapi.mjs` | typecheck/lint/build 全 pass；下方验收命令全通过 |
 
-### v1 模型 catalog（最少要包含的，后续可扩）
+### v1 模型 catalog（实际已发布，分两条 API 通路）
 
-- **image**: `flux-dev` / `flux-schnell` / `flux-pro` / `midjourney` / `nano-banana-pro` / `nano-banana-2` / `gemini-2.5-flash-image` / `qwen-image` / `seedream-5-lite` / `gpt-image`
-- **video**: `sora2` / `sora2-pro` / `veo3` / `veo3.1` / `kling-3` / `kling-3-omni` / `kling-o1` / `hailuo` / `wan2.6` / `seedance-2`
+**Unified task API**（`POST /api/v1/task`，X-API-Key，async lifecycle）：
+
+- **image**: `flux-dev` / `flux-schnell` / `flux-dev-advanced` / `midjourney` / `nano-banana-pro` / `nano-banana-2` / `gemini-2.5-flash-image` / `qwen-image` / `seedream-5-lite`
+- **video**（all async）: `sora2` / `sora2-pro` / `veo3` / `veo3.1` / `kling-3` / `kling-3-omni` / `kling-o1` / `hailuo` / `wan2.6` / `seedance-2`
 - **audio**: `udio-music` / `ace-step` / `mmaudio` / `diffrhythm` / `f5-tts`
-- **3d**: `trellis` / `trellis2`
-- **llm**: completions 代理
+- **3d**（async）: `trellis` / `trellis2`
 
-每条目 `{ name, type, taskType, provider, asyncOnly?, defaultParams? }`。`taskType` 是 piapi unified-api 的 `task_type` slug，`name` 是用户面向的别名。
+**OpenAI-compatible API**（Bearer auth，sync，no envelope）：
+
+- **image**: `gpt-image-2` / `gpt-image-1.5` / `gpt-image-1` → `/v1/images/generations`
+- **llm**: `gpt-5` / `gpt-5.2` / `gpt-4o` / `gpt-4o-mini` / `gpt-4.1` / `claude-opus-4.6` / `claude-sonnet-4.6` / `gemini-2.5-flash` → `/v1/chat/completions`
+
+每条目 `{ name, type, model, taskType?, provider, apiType?, asyncOnly?, defaultInput?, verified? }`。`apiType` 缺省 `'unified'`；`taskType` 仅 unified 路径需要。所有条目都通过 `verified: true` 标记，`// docs:` 注释指向 piapi 文档源。
 
 ## 8. 验收标准（DoD）
 

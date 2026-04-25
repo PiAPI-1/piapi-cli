@@ -18,6 +18,11 @@ piapi auth login --api-key sk-xxxxx
 
 # Generate an image
 piapi run flux-dev prompt="a corgi in space"
+piapi run gpt-image-2 prompt="a corgi in space" size=1024x1024
+
+# Chat with an LLM
+piapi run gpt-4o prompt="explain async/await in JavaScript"
+piapi run claude-sonnet-4.6 prompt="rewrite this email more concisely" system="you are a writing coach"
 
 # Generate a video (async)
 piapi run sora2-pro prompt="ocean waves" --async
@@ -28,6 +33,7 @@ piapi quota
 # List models
 piapi model list
 piapi model list --type video
+piapi model list --type llm
 ```
 
 ## Commands
@@ -35,11 +41,15 @@ piapi model list --type video
 ### piapi run \<model\> key=value...
 
 Run any model with `key=value` inputs. Video and 3D models require `--async`.
+LLM and GPT-image models use the OpenAI-compatible endpoint (sync, no
+polling); everything else uses the unified task API.
 
 ```bash
 piapi run flux-dev prompt="a corgi" aspect_ratio=16:9 num_outputs=4
 piapi run kling-3 prompt="a sunset" duration=5
 piapi run sora2-pro prompt="waves" --async
+piapi run gpt-image-2 prompt="a robot" size=1024x1024
+piapi run gpt-4o prompt="hello, world"
 piapi run flux-dev prompt="test" --dry-run
 ```
 
@@ -49,7 +59,7 @@ piapi run flux-dev prompt="test" --dry-run
 piapi task list
 piapi task list --status running
 piapi task get <id>
-piapi task cancel <id>
+piapi task cancel <id>   # provider-specific (Kling/Midjourney only); v1 returns a hint
 ```
 
 ### piapi model
@@ -95,6 +105,7 @@ piapi quota
 | `--webhook <url>` | Webhook URL for callbacks |
 | `--out-dir <path>` | Download directory |
 | `--download` | Auto-download outputs |
+| `--no-color` | Disable ANSI colors (also honours `NO_COLOR` env) |
 
 ## Configuration
 
