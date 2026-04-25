@@ -1,37 +1,24 @@
 import { defineCommand } from '../../command';
-import { resolveAPIKey } from '../../auth/resolver';
-import { request } from '../../client/http';
 import type { GlobalFlags } from '../../types/flags';
-import { Progress } from '../../output/progress';
 import { CLIError } from '../../errors/base';
 import { ExitCode } from '../../errors/codes';
 
+// PiAPI has no unified cancel endpoint. Only Kling and Midjourney expose
+// per-provider cancel APIs (see docs/llms.txt). v1 surfaces a clear error
+// rather than dispatching, since correct routing requires fetching the task
+// to learn its model first. Per-provider cancel is on the v1.x roadmap.
 export default defineCommand({
   name: 'task cancel',
-  description: 'Cancel a running task',
+  description: 'Cancel a task (v1: not implemented — see hint)',
   usage: 'piapi task cancel <id>',
-  async execute(config, flags: GlobalFlags) {
+  async execute(_config, flags: GlobalFlags) {
     const taskId = flags._positional?.[0];
     if (!taskId) throw new CLIError('Usage: piapi task cancel <id>', ExitCode.USAGE);
 
-    const apiKey = resolveAPIKey(flags.apiKey) ?? config.apiKey;
-    if (!apiKey) throw new CLIError('No API key. Run: piapi auth login --api-key sk-...', ExitCode.AUTH);
-
-    const baseUrl = flags.baseUrl ?? config.baseUrl ?? 'https://api.piapi.ai';
-
-    const spin = Progress.spin(`Cancelling task ${taskId}...`, flags);
-    try {
-      await request({
-        method: 'POST',
-        path: `/api/v1/task/${taskId}/cancel`,
-        apiKey,
-        baseUrl,
-      });
-      spin.stop();
-      process.stderr.write(`Task ${taskId} cancelled.\n`);
-    } catch (e) {
-      spin.stop();
-      throw e;
-    }
+    throw new CLIError(
+      `Task cancellation is not implemented in v1.`,
+      ExitCode.USAGE,
+      `PiAPI cancel is provider-specific (Kling/Midjourney only). Cancel via the PiAPI dashboard for now.`,
+    );
   },
 });

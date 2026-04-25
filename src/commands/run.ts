@@ -31,15 +31,17 @@ export default defineCommand({
       ExitCode.USAGE,
     );
 
-    // Parse key=value args
+    // Parse key=value args, then merge defaultInput (user values win)
     const kvArgs = (flags._positional ?? []).slice(1);
-    const input = parseInput(kvArgs);
+    const userInput = parseInput(kvArgs);
+    const input = { ...(model.defaultInput ?? {}), ...userInput };
 
     const baseUrl = flags.baseUrl ?? config.baseUrl ?? 'https://api.piapi.ai';
     const req: CreateTaskRequest = {
+      model: model.model,
       task_type: model.taskType,
-      webhook: flags.webhook,
       input,
+      ...(flags.webhook ? { config: { webhook_config: { endpoint: flags.webhook } } } : {}),
     };
 
     // Dry-run: print request without executing (no API key needed)
@@ -91,13 +93,28 @@ export default defineCommand({
     const formatter = getFormatter(flags);
     if (formatter === 'json') {
       process.stdout.write(formatJSON(finalTask) + '\n');
-    } else {
-      if (finalTask.status === 'completed') {
-        process.stdout.write(`Task ${taskId} completed.\n`);
-        if (finalTask.result) process.stdout.write(formatJSON(finalTask.result) + '\n');
-      } else {
-        throw new CLIError(`Task ${taskId} failed: ${finalTask.error ?? 'unknown error'}`, ExitCode.API_ERROR);
-      }
+      return;
+    }
+
+    if (finalTask.status !== 'completed') {
+      const err = finalTask.error?.message || finalTask.error?.raw_message || 'unknown error';
+      throw new CLIError(`Task ${taskId} failed: ${err}`, ExitCode.API_ERROR);
+    }
+
+    process.stdout.write(`Task ${taskId} completed.\n`);
+    const out = finalTask.output;
+    if (out?.image_url) process.stdout.write(`Image: ${out.image_url}\n`);
+    if (out?.image_urls?.length) {
+      for (const url of out.image_urls) process.stdout.write(`Image: ${url}\n`);
+    }
+    if (out?.video_url) process.stdout.write(`Video: ${out.video_url}\n`);
+    if (out?.audio_url) process.stdout.write(`Audio: ${out.audio_url}\n`);
+    // Fall back to full JSON when no recognised media field present
+    if (out && !out.image_url && !out.image_urls && !out.video_url && !out.audio_url) {
+      process.stdout.write(formatJSON(out) + '\n');
+    }
+    if (finalTask.meta?.usage) {
+      process.stderr.write(`Usage: ${finalTask.meta.usage.consume} ${finalTask.meta.usage.type}s\n`);
     }
   },
 });

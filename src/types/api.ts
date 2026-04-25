@@ -4,25 +4,68 @@ export interface TaskResponse {
   data: TaskData;
 }
 
+export type TaskStatus = 'pending' | 'staged' | 'processing' | 'running' | 'completed' | 'failed';
+
+export interface TaskError {
+  code: number;
+  message: string;
+  raw_message?: string;
+  detail?: unknown;
+}
+
+export interface TaskOutput {
+  image_url?: string;
+  image_urls?: string[];
+  image_base64?: string;
+  video_url?: string;
+  audio_url?: string;
+  works?: unknown[];
+  [key: string]: unknown;
+}
+
 export interface TaskData {
   task_id: string;
   task_type: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  created_at: string;
-  updated_at: string;
-  result?: unknown;
-  error?: string;
+  model?: string;
+  status: TaskStatus;
+  input?: Record<string, unknown>;
+  output?: TaskOutput;
+  meta?: {
+    created_at?: string;
+    started_at?: string;
+    ended_at?: string;
+    usage?: { type: string; frozen: number; consume: number };
+  };
+  error?: TaskError;
+  logs?: unknown[];
 }
 
 export interface AccountInfo {
-  account_name: string;
-  account_id: string;
-  remaining_credits: number;
-  quota_used?: number;
+  id: number;
+  name?: string;
+  plan?: string;
+  type?: string;
+  is_enable?: boolean;
+  credit_pack_info?: {
+    available_credits: number;
+    used_credits: number;
+    total_credits?: number;
+    frozen_credits?: number;
+    expired_credits?: number;
+    inactive_credits?: number;
+  };
+  equivalent_in_usd?: number;
 }
 
 export interface CreateTaskRequest {
+  model: string;
   task_type: string;
-  webhook?: string;
   input: Record<string, unknown>;
+  config?: {
+    webhook_config?: {
+      endpoint: string;
+      secret?: string;
+    };
+    service_mode?: 'public' | 'private';
+  };
 }

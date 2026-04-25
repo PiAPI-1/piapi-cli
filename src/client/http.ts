@@ -22,15 +22,22 @@ export async function request<T = unknown>(opts: RequestOptions): Promise<T> {
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  const data = await res.json() as { code: number; message: string; data?: T };
+  // Some PiAPI error paths return plain text (e.g. "404 page not found"),
+  // so parse defensively and fall back to raw text for the error message.
+  const text = await res.text();
+  let data: { code?: number; message?: string; data?: T } = {};
+  try { data = text ? JSON.parse(text) as typeof data : {}; } catch { /* keep empty */ }
 
-  if (!res.ok || data.code !== 0) {
+  // PiAPI envelope: { code: 200, message: "success", data: {...} }
+  // code follows HTTP convention (200 = success, >= 400 = error)
+  const apiCode = typeof data.code === 'number' ? data.code : undefined;
+  if (!res.ok || (apiCode !== undefined && apiCode >= 400)) {
     throw new APIError(
-      data.message ?? `HTTP ${res.status}`,
+      data.message || text.slice(0, 200) || `HTTP ${res.status}`,
       res.status,
-      String(data.code),
+      apiCode !== undefined ? String(apiCode) : String(res.status),
     );
   }
 
-  return data.data as T;
+  return (data.data ?? data) as T;
 }

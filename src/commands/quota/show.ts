@@ -33,9 +33,19 @@ export default defineCommand({
       if (formatter === 'json') {
         process.stdout.write(formatJSON(data) + '\n');
       } else {
-        process.stdout.write(`Account: ${data.account_name ?? data.account_id}\n`);
-        process.stdout.write(`Remaining credits: ${data.remaining_credits}\n`);
-        if (data.quota_used !== undefined) process.stdout.write(`Quota used: ${data.quota_used}\n`);
+        process.stdout.write(`Account: ${data.name ?? `#${data.id}`}\n`);
+        if (data.plan) process.stdout.write(`Plan: ${data.plan}\n`);
+        const cp = data.credit_pack_info;
+        if (cp) {
+          process.stdout.write(`Available credits: ${cp.available_credits.toLocaleString()}\n`);
+          process.stdout.write(`Used credits: ${cp.used_credits.toLocaleString()}\n`);
+          if (cp.total_credits !== undefined) {
+            process.stdout.write(`Total credits: ${cp.total_credits.toLocaleString()}\n`);
+          }
+        }
+        if (data.equivalent_in_usd !== undefined) {
+          process.stdout.write(`Equivalent: $${data.equivalent_in_usd.toFixed(2)} USD\n`);
+        }
       }
     } catch (e) {
       spin.stop();

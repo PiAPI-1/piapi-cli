@@ -8,40 +8,48 @@ import { formatJSON } from '../../output/json';
 import { CLIError } from '../../errors/base';
 import { ExitCode } from '../../errors/codes';
 
+// PiAPI's /account/active_tasks returns counts per provider, not a task array.
+// Shape: { [provider]: { staged_count, pending_count, processing_count, active_tasks } }
+type ProviderCounts = {
+  staged_count: number;
+  pending_count: number;
+  processing_count: number;
+  active_tasks: unknown;
+};
+type ActiveTasks = Record<string, ProviderCounts>;
+
 export default defineCommand({
   name: 'task list',
-  description: 'List your recent tasks',
-  usage: 'piapi task list [--status running|completed|failed] [--limit N]',
-  options: [
-    { flag: '--status <status>', description: 'Filter by status', type: 'string' },
-    { flag: '--limit <n>', description: 'Max results', type: 'number' },
-  ],
+  description: 'Show active task counts per provider',
+  usage: 'piapi task list',
   async execute(config, flags: GlobalFlags) {
     const apiKey = resolveAPIKey(flags.apiKey) ?? config.apiKey;
     if (!apiKey) throw new CLIError('No API key. Run: piapi auth login --api-key sk-...', ExitCode.AUTH);
 
     const baseUrl = flags.baseUrl ?? config.baseUrl ?? 'https://api.piapi.ai';
-
-    const params = new URLSearchParams();
-    if (flags.status) params.set('status', flags.status);
-    if (flags.limit) params.set('limit', String(flags.limit));
-
-    const path = `${Endpoints.TASK_LIST}${params.size ? `?${params}` : ''}`;
-    const data = await request<{ tasks: unknown[] }>({
-      path, apiKey, baseUrl,
-    });
+    const data = await request<ActiveTasks>({ path: Endpoints.TASK_LIST, apiKey, baseUrl });
 
     const formatter = getFormatter(flags);
     if (formatter === 'json') {
-      process.stdout.write(formatJSON(data.tasks) + '\n');
-    } else {
-      if (!data.tasks || data.tasks.length === 0) {
-        process.stdout.write('No tasks found.\n');
-      } else {
-        for (const task of data.tasks as { task_id: string; status: string; task_type: string }[]) {
-          process.stdout.write(`${task.task_id}  ${task.status}  ${task.task_type}\n`);
-        }
-      }
+      process.stdout.write(formatJSON(data) + '\n');
+      return;
+    }
+
+    const active = Object.entries(data ?? {}).filter(([, c]) =>
+      c && (c.staged_count + c.pending_count + c.processing_count) > 0,
+    );
+
+    if (active.length === 0) {
+      process.stdout.write('No active tasks.\n');
+      return;
+    }
+
+    const nameWidth = Math.max(...active.map(([p]) => p.length), 'Provider'.length);
+    process.stdout.write(`${'Provider'.padEnd(nameWidth + 2)}Staged   Pending  Processing\n`);
+    for (const [provider, c] of active) {
+      process.stdout.write(
+        `${provider.padEnd(nameWidth + 2)}${String(c.staged_count).padEnd(9)}${String(c.pending_count).padEnd(9)}${c.processing_count}\n`,
+      );
     }
   },
 });
