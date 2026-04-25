@@ -3,7 +3,7 @@ import { resolveAPIKey } from '../../auth/resolver';
 import { getTask } from '../../client/unified';
 import type { GlobalFlags } from '../../types/flags';
 import { formatJSON } from '../../output/json';
-import { Progress } from '../../output/progress';
+import { withSpinner } from '../../output/progress';
 import { CLIError } from '../../errors/base';
 import { ExitCode } from '../../errors/codes';
 
@@ -20,14 +20,11 @@ export default defineCommand({
 
     const baseUrl = flags.baseUrl ?? config.baseUrl ?? 'https://api.piapi.ai';
 
-    const spin = Progress.spin(`Fetching task ${taskId}...`, flags);
-    try {
-      const data = await getTask({ apiKey, baseUrl }, taskId);
-      spin.stop();
-      process.stdout.write(formatJSON(data) + '\n');
-    } catch (e) {
-      spin.stop();
-      throw e;
-    }
+    const data = await withSpinner(
+      `Fetching task ${taskId}...`,
+      { quiet: flags.quiet },
+      () => getTask({ apiKey, baseUrl }, taskId),
+    );
+    process.stdout.write(formatJSON(data) + '\n');
   },
 });

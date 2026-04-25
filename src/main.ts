@@ -4,7 +4,8 @@ import { registry } from './registry';
 import { handleError, setOutputMode } from './errors/handler';
 import { resolveAPIKey } from './auth/resolver';
 import { readConfigFile } from './config/loader';
-import { CLIError } from './errors/base';
+import { maybeShowStatusBar } from './output/status-bar';
+import { setNoColor } from './output/color';
 
 const VERSION = '0.1.0';
 
@@ -42,6 +43,12 @@ registry.register('help', help);
 async function main() {
   const argv = process.argv.slice(2);
 
+  // Resolve global flags before any rendering so --no-color and --output
+  // affect even the early help/version path.
+  const preFlags = parseFlags(argv, GLOBAL_OPTIONS);
+  setOutputMode(preFlags.output ?? 'text');
+  setNoColor(preFlags.noColor === true);
+
   if (argv.includes('--version') || argv.includes('-v')) {
     process.stdout.write(`piapi ${VERSION}\n`);
     process.exit(0);
@@ -59,21 +66,7 @@ async function main() {
     process.exit(0);
   }
 
-  // Pre-parse output mode for error handler setup
-  const preFlags = parseFlags(argv, GLOBAL_OPTIONS);
-  setOutputMode(preFlags.output ?? 'text');
-
-  let command;
-  let extra: string[] = [];
-  try {
-    ({ command, extra } = registry.resolve(commandPath));
-  } catch (e) {
-    if (e instanceof CLIError) {
-      process.stderr.write(`${e.message}\n`);
-      process.exit(e.code);
-    }
-    throw e;
-  }
+  const { command, extra } = registry.resolve(commandPath);
 
   const flags = parseFlags(argv, [...GLOBAL_OPTIONS, ...(command.options ?? [])]);
 
@@ -83,15 +76,34 @@ async function main() {
   flags._positional = extra.length > 0 ? [...extra, ...stripped] : stripped;
 
   const fileConfig = readConfigFile();
+  const apiKey = resolveAPIKey(flags.apiKey) ?? fileConfig.apiKey;
+  const keySource: 'flag' | 'env' | 'file' | 'none' =
+    flags.apiKey ? 'flag' :
+    process.env.PIAPI_API_KEY ? 'env' :
+    fileConfig.apiKey ? 'file' : 'none';
+  const baseUrl = flags.baseUrl ?? fileConfig.baseUrl ?? 'https://api.piapi.ai';
   const config = {
     ...fileConfig,
-    apiKey: resolveAPIKey(flags.apiKey) ?? fileConfig.apiKey,
-    baseUrl: flags.baseUrl ?? fileConfig.baseUrl ?? 'https://api.piapi.ai',
+    apiKey,
+    baseUrl,
     quiet: flags.quiet,
     output: flags.output,
     nonInteractive: flags.nonInteractive,
     dryRun: flags.dryRun,
   };
+
+  // Brand banner — skipped in JSON mode, dry-run, auth flows, and `config` ops
+  // (which print the same info themselves), or whenever stderr isn't a TTY.
+  const skipBanner =
+    flags.output === 'json' ||
+    flags.dryRun ||
+    commandPath[0] === 'help' ||
+    commandPath[0] === 'auth' ||
+    commandPath[0] === 'config';
+  if (!skipBanner) {
+    const model = commandPath[0] === 'run' ? flags._positional?.[0] : undefined;
+    maybeShowStatusBar({ apiKey, keySource, baseUrl, quiet: flags.quiet, model });
+  }
 
   await command.execute(config, flags);
 }

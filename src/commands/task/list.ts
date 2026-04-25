@@ -5,6 +5,7 @@ import { Endpoints } from '../../client/endpoints';
 import type { GlobalFlags } from '../../types/flags';
 import { getFormatter } from '../../output/formatter';
 import { formatJSON } from '../../output/json';
+import { formatTable } from '../../output/text';
 import { CLIError } from '../../errors/base';
 import { ExitCode } from '../../errors/codes';
 
@@ -44,12 +45,12 @@ export default defineCommand({
       return;
     }
 
-    const nameWidth = Math.max(...active.map(([p]) => p.length), 'Provider'.length);
-    process.stdout.write(`${'Provider'.padEnd(nameWidth + 2)}Staged   Pending  Processing\n`);
-    for (const [provider, c] of active) {
-      process.stdout.write(
-        `${provider.padEnd(nameWidth + 2)}${String(c.staged_count).padEnd(9)}${String(c.pending_count).padEnd(9)}${c.processing_count}\n`,
-      );
-    }
+    const rows = active.map(([provider, c]) => ({
+      provider,
+      staged: c.staged_count,
+      pending: c.pending_count,
+      processing: c.processing_count,
+    }));
+    process.stdout.write(formatTable(rows) + '\n');
   },
 });

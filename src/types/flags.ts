@@ -3,6 +3,7 @@ export interface GlobalFlags {
   baseUrl?: string;
   output?: 'json' | 'text';
   quiet?: boolean;
+  noColor?: boolean;
   nonInteractive?: boolean;
   async?: boolean;
   dryRun?: boolean;

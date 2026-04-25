@@ -12,6 +12,7 @@ export const GLOBAL_OPTIONS: FlagOption[] = [
   { flag: '--base-url <url>', description: 'API base URL', type: 'string' },
   { flag: '--output <format>', description: 'Output format: json, text', type: 'string' },
   { flag: '--quiet', description: 'Suppress progress indicators' },
+  { flag: '--no-color', description: 'Disable ANSI colors and spinner' },
   { flag: '--non-interactive', description: 'Fail when interactive input is needed' },
   { flag: '--async', description: 'Return task ID immediately without polling' },
   { flag: '--dry-run', description: 'Print request without executing' },

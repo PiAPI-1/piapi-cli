@@ -1,6 +1,7 @@
 import type { CommandSpec } from './types/commands';
 import { CLIError } from './errors/base';
 import { ExitCode } from './errors/codes';
+import { colorEnabled } from './output/color';
 
 interface CommandNode {
   command?: CommandSpec;
@@ -69,9 +70,9 @@ class Registry {
     out.write('\n');
   }
 
-  private bold   = (s: string, out: NodeJS.WriteStream) => out.isTTY ? `\x1b[1m${s}\x1b[0m` : s;
-  private dim    = (s: string, out: NodeJS.WriteStream) => out.isTTY ? `\x1b[2m${s}\x1b[0m` : s;
-  private accent = (s: string, out: NodeJS.WriteStream) => out.isTTY ? `\x1b[1;38;2;30;110;220m${s}\x1b[0m` : s;
+  private bold   = (s: string, out: NodeJS.WriteStream) => colorEnabled(out) ? `\x1b[1m${s}\x1b[0m` : s;
+  private dim    = (s: string, out: NodeJS.WriteStream) => colorEnabled(out) ? `\x1b[2m${s}\x1b[0m` : s;
+  private accent = (s: string, out: NodeJS.WriteStream) => colorEnabled(out) ? `\x1b[1;38;2;30;110;220m${s}\x1b[0m` : s;
 
   // 6-row pure-blue gradient: deep navy → bright blue (no purple, no cyan).
   private static readonly LOGO = [
@@ -93,9 +94,10 @@ class Registry {
 
   private printRoot(out: NodeJS.WriteStream): void {
     out.write('\n');
+    const useColor = colorEnabled(out);
     for (let i = 0; i < Registry.LOGO.length; i++) {
       const line = Registry.LOGO[i]!;
-      if (out.isTTY) {
+      if (useColor) {
         const [r, g, b] = Registry.GRADIENT[i]!;
         out.write(`\x1b[1;38;2;${r};${g};${b}m${line}\x1b[0m\n`);
       } else {
@@ -123,6 +125,7 @@ ${b('Global Flags:')}
   ${a('--base-url <url>')}       ${d('API base URL')}
   ${a('--output <format>')}      ${d('Output format: json, text')}
   ${a('--quiet')}                ${d('Suppress progress indicators')}
+  ${a('--no-color')}             ${d('Disable ANSI colors and spinner')}
   ${a('--non-interactive')}      ${d('Fail when input is needed')}
   ${a('--async')}                ${d('Return task ID without polling')}
   ${a('--dry-run')}              ${d('Show request without executing')}

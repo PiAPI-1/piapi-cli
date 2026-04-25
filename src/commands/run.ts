@@ -8,9 +8,25 @@ import type { GlobalFlags } from '../types/flags';
 import type { CreateTaskRequest } from '../types/api';
 import { getFormatter } from '../output/formatter';
 import { formatJSON } from '../output/json';
-import { Progress } from '../output/progress';
+import { withSpinner } from '../output/progress';
 import { CLIError } from '../errors/base';
 import { ExitCode } from '../errors/codes';
+
+function extractUrls(value: unknown, path = ''): { label: string; url: string }[] {
+  if (value == null) return [];
+  if (typeof value === 'string') {
+    return /^https?:\/\//.test(value) ? [{ label: path || 'url', url: value }] : [];
+  }
+  if (Array.isArray(value)) {
+    return value.flatMap((v, i) => extractUrls(v, `${path}[${i}]`));
+  }
+  if (typeof value === 'object') {
+    return Object.entries(value as Record<string, unknown>).flatMap(([k, v]) =>
+      extractUrls(v, path ? `${path}.${k}` : k),
+    );
+  }
+  return [];
+}
 
 export default defineCommand({
   name: 'run',
@@ -60,34 +76,37 @@ export default defineCommand({
 
     // Async mode: just create and return task ID
     if (flags.async || model.asyncOnly) {
-      const spin = Progress.spin('Creating task...', flags);
-      try {
-        const task = await createTask({ apiKey, baseUrl }, req);
-        spin.stop();
-        const formatter = getFormatter(flags);
-        if (formatter === 'json') {
-          process.stdout.write(formatJSON({ task_id: task.task_id, status: task.status }) + '\n');
-        } else {
-          process.stdout.write(`Task created: ${task.task_id} (${task.status})\n`);
-          process.stdout.write(`Check status: piapi task get ${task.task_id}\n`);
-        }
-      } catch (e) { spin.stop(); throw e; }
+      const task = await withSpinner(
+        'Creating task...',
+        { quiet: flags.quiet },
+        () => createTask({ apiKey, baseUrl }, req),
+      );
+      const formatter = getFormatter(flags);
+      if (formatter === 'json') {
+        process.stdout.write(formatJSON({ task_id: task.task_id, status: task.status }) + '\n');
+      } else {
+        process.stdout.write(`Task created: ${task.task_id} (${task.status})\n`);
+        process.stdout.write(`Check status: piapi task get ${task.task_id}\n`);
+      }
       return;
     }
 
     // Sync mode: create task and poll until done
-    const spin = Progress.spin('Creating task...', flags);
-    let taskId: string;
-    try {
-      const task = await createTask({ apiKey, baseUrl }, req);
-      taskId = task.task_id;
-      spin.stop();
-    } catch (e) { spin.stop(); throw e; }
+    const created = await withSpinner(
+      'Creating task...',
+      { quiet: flags.quiet },
+      () => createTask({ apiKey, baseUrl }, req),
+    );
+    const taskId = created.task_id;
 
     const finalTask = await pollTask(
       async () => getTask({ apiKey, baseUrl }, taskId),
       (t) => t.status === 'completed' || t.status === 'failed',
-      { quiet: flags.quiet },
+      {
+        quiet: flags.quiet,
+        label: `Running ${model.name}…`,
+        getStatus: (t) => t.status,
+      },
     );
 
     const formatter = getFormatter(flags);
@@ -103,14 +122,13 @@ export default defineCommand({
 
     process.stdout.write(`Task ${taskId} completed.\n`);
     const out = finalTask.output;
-    if (out?.image_url) process.stdout.write(`Image: ${out.image_url}\n`);
-    if (out?.image_urls?.length) {
-      for (const url of out.image_urls) process.stdout.write(`Image: ${url}\n`);
-    }
-    if (out?.video_url) process.stdout.write(`Video: ${out.video_url}\n`);
-    if (out?.audio_url) process.stdout.write(`Audio: ${out.audio_url}\n`);
-    // Fall back to full JSON when no recognised media field present
-    if (out && !out.image_url && !out.image_urls && !out.video_url && !out.audio_url) {
+    // Output schema varies per model (image_url, video, model_file, works[].audio…).
+    // Walk the tree and print every http(s) URL with its key path; fall back to
+    // raw JSON if no URLs found so the user still sees the result.
+    const urls = extractUrls(out);
+    if (urls.length > 0) {
+      for (const { label, url } of urls) process.stdout.write(`${label}: ${url}\n`);
+    } else if (out) {
       process.stdout.write(formatJSON(out) + '\n');
     }
     if (finalTask.meta?.usage) {
