@@ -103,6 +103,12 @@ export const MODELS: ModelEntry[] = [
   // docs: https://piapi.ai/docs/joycaption-api/create-task.md
   { name: 'joycaption', type: 'image', model: 'Qubico/joycaption', taskType: 'joycaption-beta-one', provider: 'JoyCaption', verified: true },
 
+  // ========== faceswap (image) ==========
+  // docs: https://piapi.ai/docs/faceswap-api/create-task.md
+  { name: 'faceswap', type: 'image', model: 'Qubico/image-toolkit', taskType: 'face-swap', provider: 'Faceswap', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/multi-face-swap/create-task.md
+  { name: 'multi-faceswap', type: 'image', model: 'Qubico/image-toolkit', taskType: 'multi-face-swap', provider: 'Faceswap', asyncOnly: true, verified: true },
+
   // ========== video ==========
   // docs: https://piapi.ai/docs/sora2-api/text-to-video.md
   { name: 'sora2', type: 'video', model: 'sora2', taskType: 'sora2-video', provider: 'Sora', asyncOnly: true, verified: true },
@@ -190,6 +196,8 @@ export const MODELS: ModelEntry[] = [
   { name: 'video-upscale', type: 'video', model: 'Qubico/video-toolkit', taskType: 'upscale', provider: 'VideoToolkit', asyncOnly: true, verified: true },
   // docs: https://piapi.ai/docs/tools/video-remove-background-api.md
   { name: 'video-remove-bg', type: 'video', model: 'Qubico/video-toolkit', taskType: 'background-remove', provider: 'VideoToolkit', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/faceswap-api/video-faceswap.md
+  { name: 'video-faceswap', type: 'video', model: 'Qubico/video-toolkit', taskType: 'face-swap', provider: 'Faceswap', asyncOnly: true, verified: true },
 
   // ========== audio ==========
   // docs: https://piapi.ai/docs/music-api/create-task.md
