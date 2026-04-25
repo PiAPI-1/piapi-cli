@@ -1,6 +1,7 @@
 import { CLIError } from './base';
 import { ExitCode } from './codes';
 import { formatErrorJSON } from '../output/json';
+import { ANSI, colorEnabled } from '../output/color';
 
 let outputMode: 'json' | 'text' = 'text';
 
@@ -13,8 +14,11 @@ function emit(code: number, message: string, hint?: string): void {
     process.stderr.write(formatErrorJSON(code, message, hint) + '\n');
     return;
   }
-  if (message) process.stderr.write(`${message}\n`);
-  if (hint) process.stderr.write(`Hint: ${hint}\n`);
+  const useColor = colorEnabled(process.stderr);
+  const cross = useColor ? `${ANSI.red}✗${ANSI.reset}` : '✗';
+  const arrow = useColor ? `${ANSI.dim}→${ANSI.reset}` : '→';
+  if (message) process.stderr.write(`${cross} ${message}\n`);
+  if (hint)    process.stderr.write(`${arrow} ${hint}\n`);
 }
 
 export function handleError(e: unknown): void {

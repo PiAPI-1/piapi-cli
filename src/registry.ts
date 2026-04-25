@@ -1,7 +1,7 @@
 import type { CommandSpec } from './types/commands';
 import { CLIError } from './errors/base';
 import { ExitCode } from './errors/codes';
-import { colorEnabled } from './output/color';
+import { ANSI, colorEnabled } from './output/color';
 
 interface CommandNode {
   command?: CommandSpec;
@@ -70,11 +70,12 @@ class Registry {
     out.write('\n');
   }
 
-  private bold   = (s: string, out: NodeJS.WriteStream) => colorEnabled(out) ? `\x1b[1m${s}\x1b[0m` : s;
-  private dim    = (s: string, out: NodeJS.WriteStream) => colorEnabled(out) ? `\x1b[2m${s}\x1b[0m` : s;
-  private accent = (s: string, out: NodeJS.WriteStream) => colorEnabled(out) ? `\x1b[1;38;2;30;110;220m${s}\x1b[0m` : s;
+  private bold   = (s: string, out: NodeJS.WriteStream) => colorEnabled(out) ? `${ANSI.bold}${s}${ANSI.reset}` : s;
+  private dim    = (s: string, out: NodeJS.WriteStream) => colorEnabled(out) ? `${ANSI.dim}${s}${ANSI.reset}` : s;
+  private accent = (s: string, out: NodeJS.WriteStream) => colorEnabled(out) ? `${ANSI.bold}${ANSI.blue}${s}${ANSI.reset}` : s;
 
-  // 6-row pure-blue gradient: deep navy → bright blue (no purple, no cyan).
+  // 6-row pure-blue gradient: deep navy → bright blue. Logo-specific so it
+  // stays as a local RGB array; everything else flows from color.ts.
   private static readonly LOGO = [
     '██████╗ ██╗ █████╗ ██████╗ ██╗',
     '██╔══██╗██║██╔══██╗██╔══██╗██║',
@@ -99,7 +100,7 @@ class Registry {
       const line = Registry.LOGO[i]!;
       if (useColor) {
         const [r, g, b] = Registry.GRADIENT[i]!;
-        out.write(`\x1b[1;38;2;${r};${g};${b}m${line}\x1b[0m\n`);
+        out.write(`${ANSI.bold}\x1b[38;2;${r};${g};${b}m${line}${ANSI.reset}\n`);
       } else {
         out.write(line + '\n');
       }
