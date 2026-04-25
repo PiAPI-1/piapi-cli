@@ -29,6 +29,7 @@ export interface ModelEntry {
   provider: string;      // display label
   apiType?: ApiType;     // default 'unified'
   asyncOnly?: boolean;
+  streamingOnly?: boolean;  // openai-completions only — force stream=true (sora2-preview)
   defaultInput?: Record<string, unknown>;  // merged into request input/body (user values win)
   verified?: boolean;    // true = real `model` string verified against piapi docs
 }
@@ -243,6 +244,13 @@ export const MODELS: ModelEntry[] = [
   { name: 'claude-opus-4.6', type: 'llm', model: 'claude-opus-4-6', provider: 'Anthropic', apiType: 'openai-completions', verified: true },
   { name: 'claude-sonnet-4.6', type: 'llm', model: 'claude-sonnet-4-6', provider: 'Anthropic', apiType: 'openai-completions', verified: true },
   { name: 'gemini-2.5-flash', type: 'llm', model: 'gemini-2.5-flash-nothinking', provider: 'Google', apiType: 'openai-completions', verified: true },
+
+  // ========== OpenAI-compat: Sora2 streaming ==========
+  // PiAPI wraps sora2 video generation as a streamed chat completion;
+  // the assistant content is markdown that includes the final video URL.
+  // docs: https://piapi.ai/docs/sora2-preview-api/text-to-video.md
+  { name: 'sora2-preview', type: 'video', model: 'sora-2-preview', provider: 'Sora', apiType: 'openai-completions', streamingOnly: true, verified: true },
+  { name: 'sora2-hd-preview', type: 'video', model: 'sora-2-hd-preview', provider: 'Sora', apiType: 'openai-completions', streamingOnly: true, verified: true },
 ];
 
 export function getModel(name: string): ModelEntry | undefined {

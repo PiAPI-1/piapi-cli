@@ -82,3 +82,81 @@ export function chatCompletion(client: OpenAIClient, body: ChatRequest): Promise
 export function imageGeneration(client: OpenAIClient, body: ImageRequest): Promise<ImageResponse> {
   return postBearer<ImageResponse>(client, '/v1/images/generations', body);
 }
+
+export type ChatUsage = NonNullable<ChatResponse['usage']>;
+export type ChatStreamEvent =
+  | { type: 'delta'; content: string }
+  | { type: 'usage'; usage: ChatUsage }
+  | { type: 'done' };
+
+interface ChatStreamChunk {
+  choices?: { index: number; delta?: { content?: string }; finish_reason?: string | null }[];
+  usage?: ChatUsage;
+}
+
+// SSE-streaming variant. PiAPI's sora2-preview / sora2-hd-preview force
+// stream=true and emit chat.completion.chunk events whose `delta.content`
+// concatenates to the assistant message; the final chunk carries `usage`.
+// We swallow malformed/empty `data:` lines defensively because PiAPI also
+// emits keep-alive blank lines and the trailing `data: [DONE]` sentinel.
+export async function* chatCompletionStream(
+  client: OpenAIClient,
+  body: ChatRequest,
+): AsyncGenerator<ChatStreamEvent, void, void> {
+  const res = await fetch(`${client.baseUrl}/v1/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${client.apiKey}`,
+      Accept: 'text/event-stream',
+    },
+    body: JSON.stringify({ ...body, stream: true }),
+  });
+
+  if (!res.ok || !res.body) {
+    const text = await res.text();
+    let msg = text.slice(0, 500);
+    try {
+      const parsed = JSON.parse(text) as { error?: { message?: string }; message?: string };
+      msg = parsed.error?.message || parsed.message || msg;
+    } catch { /* keep raw */ }
+    throw new APIError(msg || `HTTP ${res.status}`, res.status, String(res.status));
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSE events are separated by blank lines (\n\n or \r\n\r\n).
+      let sep: number;
+      while ((sep = buffer.search(/\r?\n\r?\n/)) !== -1) {
+        const eventBlock = buffer.slice(0, sep);
+        buffer = buffer.slice(sep).replace(/^\r?\n\r?\n/, '');
+
+        for (const rawLine of eventBlock.split(/\r?\n/)) {
+          const line = rawLine.trimStart();
+          if (!line.startsWith('data:')) continue;
+          const payload = line.slice(5).trim();
+          if (!payload) continue;
+          if (payload === '[DONE]') { yield { type: 'done' }; return; }
+          try {
+            const chunk = JSON.parse(payload) as ChatStreamChunk;
+            const delta = chunk.choices?.[0]?.delta?.content;
+            if (typeof delta === 'string' && delta.length > 0) {
+              yield { type: 'delta', content: delta };
+            }
+            if (chunk.usage) yield { type: 'usage', usage: chunk.usage };
+          } catch { /* malformed chunk — skip */ }
+        }
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}

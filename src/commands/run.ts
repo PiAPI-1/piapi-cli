@@ -6,9 +6,11 @@ import { parseInput } from '../models/input-parser';
 import { createTask, getTask } from '../client/unified';
 import {
   chatCompletion,
+  chatCompletionStream,
   imageGeneration,
   type ChatMessage,
   type ChatRequest,
+  type ChatUsage,
   type ImageRequest,
 } from '../client/openai-compat';
 import { pollTask } from '../polling/poll';
@@ -111,10 +113,18 @@ async function runOpenAIChat(
 ): Promise<void> {
   const body = buildChatBody(model.model, input);
   if (flags.dryRun) {
-    process.stderr.write(`[DRY RUN] POST ${baseUrl}/v1/chat/completions\n`);
-    process.stderr.write(`[DRY RUN] Body: ${formatJSON(body)}\n`);
+    const path = '/v1/chat/completions';
+    const dryBody = model.streamingOnly ? { ...body, stream: true } : body;
+    process.stderr.write(`[DRY RUN] POST ${baseUrl}${path}\n`);
+    process.stderr.write(`[DRY RUN] Body: ${formatJSON(dryBody)}\n`);
     return;
   }
+
+  if (model.streamingOnly) {
+    await runOpenAIChatStream(model, body, apiKey, baseUrl, flags);
+    return;
+  }
+
   const res = await withSpinner(
     `${model.name}…`,
     { quiet: flags.quiet },
@@ -130,6 +140,58 @@ async function runOpenAIChat(
   if (res.usage) {
     process.stderr.write(
       `Usage: ${res.usage.total_tokens} tokens (in ${res.usage.prompt_tokens}, out ${res.usage.completion_tokens})\n`,
+    );
+  }
+}
+
+// PiAPI's sora2-preview wraps video generation as a streamed chat
+// completion: the assistant message is markdown narrating progress and
+// ends with the final video URL embedded as `[Play▶️](https://...mp4)`.
+// Stream chunks straight to stdout (TTY) so the user sees progress as it
+// arrives, then extract every URL from the accumulated content at the
+// end and print them on dedicated lines for easy copy-paste / grepping.
+async function runOpenAIChatStream(
+  _model: ModelEntry,
+  body: ChatRequest,
+  apiKey: string,
+  baseUrl: string,
+  flags: GlobalFlags,
+): Promise<void> {
+  const formatter = getFormatter(flags);
+  let accumulated = '';
+  let usage: ChatUsage | undefined;
+
+  for await (const ev of chatCompletionStream({ apiKey, baseUrl }, body)) {
+    if (ev.type === 'delta') {
+      accumulated += ev.content;
+      if (formatter !== 'json' && !flags.quiet) process.stdout.write(ev.content);
+    } else if (ev.type === 'usage') {
+      usage = ev.usage;
+    }
+  }
+
+  if (formatter === 'json') {
+    process.stdout.write(formatJSON({ content: accumulated, usage }) + '\n');
+    return;
+  }
+
+  if (accumulated.length > 0 && !accumulated.endsWith('\n')) process.stdout.write('\n');
+
+  // Pull every http(s) URL out of the markdown blob, dedupe in order.
+  const seen = new Set<string>();
+  const urls: string[] = [];
+  for (const m of accumulated.matchAll(/https?:\/\/[^\s)\]]+/g)) {
+    const url = m[0]!.replace(/[.,;:!?]+$/, '');
+    if (!seen.has(url)) { seen.add(url); urls.push(url); }
+  }
+  if (urls.length > 0) {
+    process.stdout.write('\n');
+    for (const url of urls) process.stdout.write(`url: ${url}\n`);
+  }
+
+  if (usage) {
+    process.stderr.write(
+      `Usage: ${usage.total_tokens} tokens (in ${usage.prompt_tokens}, out ${usage.completion_tokens})\n`,
     );
   }
 }
