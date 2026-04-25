@@ -7,6 +7,7 @@ import { readConfigFile } from './config/loader';
 import { maybeShowStatusBar } from './output/status-bar';
 import { setNoColor } from './output/color';
 import { stopAllSpinners } from './output/progress';
+import { maybeNotifyUpdate } from './update-check';
 
 // Injected at build time from package.json via Bun's `define`. The fallback
 // only fires under `bun run dev` (source mode), where the build step hasn't run.
@@ -113,6 +114,11 @@ async function main() {
   }
 
   await command.execute(config, flags);
+
+  // Print update hint last so it never interleaves with command output. Skip
+  // for JSON consumers and quiet runs; the function also self-skips on dev
+  // builds and non-TTY stderr.
+  if (flags.output !== 'json' && !flags.quiet) maybeNotifyUpdate(VERSION);
 }
 
 main().catch(handleError);

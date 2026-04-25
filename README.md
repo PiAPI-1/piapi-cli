@@ -158,6 +158,8 @@ Precedence: CLI flags → environment variables → config file → defaults.
 |---|---|
 | `PIAPI_API_KEY` | API key |
 | `PIAPI_BASE_URL` | Override API base URL |
+| `PIAPI_TIMEOUT_MS` | Override fetch timeout (default 30s API / 60s upload+download) |
+| `PIAPI_NO_UPDATE_CHECK` | Disable the daily npm-version check |
 | `NO_COLOR` | Disable ANSI colors (any truthy value) |
 
 ## AI Agent Integration

@@ -158,6 +158,8 @@ piapi quota
 |---|---|
 | `PIAPI_API_KEY` | API 密钥 |
 | `PIAPI_BASE_URL` | 覆盖 API 基础 URL |
+| `PIAPI_TIMEOUT_MS` | 覆盖请求超时（默认 API 30s / 上传下载 60s） |
+| `PIAPI_NO_UPDATE_CHECK` | 关闭每日 npm 版本检查 |
 | `NO_COLOR` | 关闭 ANSI 颜色（任意非空值） |
 
 ## AI Agent 集成
