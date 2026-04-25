@@ -8,7 +8,9 @@ import { maybeShowStatusBar } from './output/status-bar';
 import { setNoColor } from './output/color';
 import { stopAllSpinners } from './output/progress';
 
-const VERSION = '0.1.0';
+// Injected at build time from package.json via Bun's `define`. The fallback
+// only fires under `bun run dev` (source mode), where the build step hasn't run.
+const VERSION = process.env.CLI_VERSION ?? '0.0.0-dev';
 
 process.on('SIGINT', () => {
   stopAllSpinners();
