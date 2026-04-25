@@ -28,6 +28,7 @@ piapi auth status
 | `--quiet` | Suppress spinners/progress; stdout is pure data |
 | `--output json` | Machine-readable JSON output |
 | `--async` | Return task ID immediately without polling |
+| `--stream` | Stream LLM output as it arrives (openai-completions only) |
 | `--dry-run` | Preview the API request without executing |
 | `--api-key <key>` | Override API key per-call |
 | `--webhook <url>` | Set webhook URL for async callbacks |
@@ -60,6 +61,7 @@ piapi run flux-dev prompt="test" --dry-run
 | Flag | Description |
 |---|---|
 | `--async` | Return task ID immediately (required for video/3D unified models) |
+| `--stream` | Stream LLM output as it arrives (openai-completions only) |
 | `--dry-run` | Print request body without sending |
 | `--webhook <url>` | Webhook for unified-API completion callbacks |
 | `--out-dir <path>` | Download outputs to directory |

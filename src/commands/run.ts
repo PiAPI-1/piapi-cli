@@ -112,15 +112,19 @@ async function runOpenAIChat(
   flags: GlobalFlags,
 ): Promise<void> {
   const body = buildChatBody(model.model, input);
+  // streamingOnly is a model property (sora2-preview forces stream=true);
+  // --stream is a user opt-in for any openai-completions model.
+  const useStream = model.streamingOnly === true || flags.stream === true;
+
   if (flags.dryRun) {
     const path = '/v1/chat/completions';
-    const dryBody = model.streamingOnly ? { ...body, stream: true } : body;
+    const dryBody = useStream ? { ...body, stream: true } : body;
     process.stderr.write(`[DRY RUN] POST ${baseUrl}${path}\n`);
     process.stderr.write(`[DRY RUN] Body: ${formatJSON(dryBody)}\n`);
     return;
   }
 
-  if (model.streamingOnly) {
+  if (useStream) {
     await runOpenAIChatStream(model, body, apiKey, baseUrl, flags);
     return;
   }
@@ -287,6 +291,7 @@ export default defineCommand({
     'piapi run flux-dev prompt="a corgi" aspect_ratio=16:9',
     'piapi run gpt-image-2 prompt="a robot" size=1024x1024',
     'piapi run gpt-4o prompt="explain async/await in JS"',
+    'piapi run claude-opus-4.6 prompt="rewrite this" --stream',
     'piapi run sora2-pro prompt="a sunset" --async',
     'piapi run flux-dev prompt="test" --dry-run',
   ],

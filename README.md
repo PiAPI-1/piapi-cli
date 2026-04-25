@@ -101,6 +101,7 @@ piapi quota
 | `--quiet` | Suppress progress indicators |
 | `--non-interactive` | Fail on missing input |
 | `--async` | Return task ID immediately |
+| `--stream` | Stream LLM output as it arrives (openai-completions only) |
 | `--dry-run` | Preview request without executing |
 | `--webhook <url>` | Webhook URL for callbacks |
 | `--out-dir <path>` | Download directory |

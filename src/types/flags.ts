@@ -6,6 +6,7 @@ export interface GlobalFlags {
   noColor?: boolean;
   nonInteractive?: boolean;
   async?: boolean;
+  stream?: boolean;
   dryRun?: boolean;
   webhook?: string;
   outDir?: string;
