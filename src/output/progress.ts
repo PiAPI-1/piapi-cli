@@ -12,15 +12,26 @@ export interface Spinner {
   stop(finalText?: string): void;
 }
 
+// Track every running spinner so SIGINT can clear the line before the
+// process exits, preventing a half-rendered braille frame from being
+// left in the terminal.
+const active = new Set<Spinner>();
+
+export function stopAllSpinners(): void {
+  for (const s of active) s.stop();
+  active.clear();
+}
+
 export function createSpinner(label: string): Spinner {
   const enabled = ttyEnabled();
   let frame = 0;
   let interval: ReturnType<typeof setInterval> | null = null;
   let currentLabel = label;
 
-  return {
+  const self: Spinner = {
     start() {
       if (!enabled || interval) return;
+      active.add(self);
       interval = setInterval(() => {
         process.stderr.write(`\r${SPINNER_FRAMES[frame % SPINNER_FRAMES.length]} ${currentLabel}`);
         frame++;
@@ -34,12 +45,14 @@ export function createSpinner(label: string): Spinner {
         clearInterval(interval);
         interval = null;
       }
+      active.delete(self);
       if (enabled) {
         process.stderr.write('\r\x1b[K');
       }
       if (finalText) process.stderr.write(`${finalText}\n`);
     },
   };
+  return self;
 }
 
 export interface ProgressBar {
