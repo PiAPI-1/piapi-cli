@@ -25,7 +25,7 @@ export default defineCommand({
     }
 
     const data = await withSpinner(
-      'Fetching account info...',
+      'Fetching account info…',
       { quiet: flags.quiet },
       () => getAccountInfo({ apiKey, baseUrl }) as Promise<AccountInfo>,
     );

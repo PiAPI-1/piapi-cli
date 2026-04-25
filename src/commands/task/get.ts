@@ -21,7 +21,7 @@ export default defineCommand({
     const baseUrl = flags.baseUrl ?? config.baseUrl ?? 'https://api.piapi.ai';
 
     const data = await withSpinner(
-      `Fetching task ${taskId}...`,
+      `Fetching task ${taskId}…`,
       { quiet: flags.quiet },
       () => getTask({ apiKey, baseUrl }, taskId),
     );
