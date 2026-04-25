@@ -1,4 +1,5 @@
 import { APIError } from '../errors/api';
+import { DEFAULT_API_TIMEOUT_MS, resolveTimeout, timeoutSignal } from './timeout';
 
 export interface RequestOptions {
   method?: string;
@@ -12,15 +13,24 @@ export interface RequestOptions {
 export async function request<T = unknown>(opts: RequestOptions): Promise<T> {
   const { method = 'GET', path, body, headers = {}, apiKey, baseUrl } = opts;
 
-  const res = await fetch(`${baseUrl}${path}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-API-Key': apiKey,
-      ...headers,
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${baseUrl}${path}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': apiKey,
+        ...headers,
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      signal: timeoutSignal(DEFAULT_API_TIMEOUT_MS),
+    });
+  } catch (e) {
+    if (e instanceof Error && e.name === 'TimeoutError') {
+      throw new APIError(`Request timed out after ${resolveTimeout(DEFAULT_API_TIMEOUT_MS)}ms (set PIAPI_TIMEOUT_MS to override)`, 0, 'TIMEOUT');
+    }
+    throw e;
+  }
 
   // Some PiAPI error paths return plain text (e.g. "404 page not found"),
   // so parse defensively and fall back to raw text for the error message.

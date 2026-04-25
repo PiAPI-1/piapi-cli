@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { basename } from 'node:path';
 import { Endpoints } from '../client/endpoints';
+import { DEFAULT_TRANSFER_TIMEOUT_MS, resolveTimeout, timeoutSignal } from '../client/timeout';
 
 export interface UploadResult {
   url: string;
@@ -12,14 +13,23 @@ export async function uploadFile(apiKey: string, filePath: string): Promise<Uplo
   const b64 = buf.toString('base64');
   const filename = basename(filePath);
 
-  const res = await fetch(`${Endpoints.UPLOAD_BASE}${Endpoints.FILE_UPLOAD}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-    },
-    body: JSON.stringify({ file_name: filename, file_data: b64 }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${Endpoints.UPLOAD_BASE}${Endpoints.FILE_UPLOAD}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+      },
+      body: JSON.stringify({ file_name: filename, file_data: b64 }),
+      signal: timeoutSignal(DEFAULT_TRANSFER_TIMEOUT_MS),
+    });
+  } catch (e) {
+    if (e instanceof Error && e.name === 'TimeoutError') {
+      throw new Error(`Upload timed out after ${resolveTimeout(DEFAULT_TRANSFER_TIMEOUT_MS)}ms: ${filename} (set PIAPI_TIMEOUT_MS to override)`);
+    }
+    throw e;
+  }
 
   if (!res.ok) {
     const text = await res.text();

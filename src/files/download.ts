@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
+import { DEFAULT_TRANSFER_TIMEOUT_MS, resolveTimeout, timeoutSignal } from '../client/timeout';
 
 export interface DownloadOptions {
   outDir?: string;
@@ -38,7 +39,15 @@ function filenameFromUrl(url: string): string {
 // path written. Creates the directory if missing. On collision we keep
 // it simple and overwrite — the caller can pre-flight if they care.
 export async function downloadUrl(url: string, opts: DownloadOptions = {}): Promise<string> {
-  const res = await fetch(url);
+  let res: Response;
+  try {
+    res = await fetch(url, { signal: timeoutSignal(DEFAULT_TRANSFER_TIMEOUT_MS) });
+  } catch (e) {
+    if (e instanceof Error && e.name === 'TimeoutError') {
+      throw new Error(`Download timed out after ${resolveTimeout(DEFAULT_TRANSFER_TIMEOUT_MS)}ms: ${url} (set PIAPI_TIMEOUT_MS to override)`);
+    }
+    throw e;
+  }
   if (!res.ok) throw new Error(`Download failed (${res.status}): ${url}`);
 
   const dir = opts.outDir ?? process.cwd();

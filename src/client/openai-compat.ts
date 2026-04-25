@@ -9,6 +9,7 @@
 //   https://piapi.ai/docs/gpt-image/gpt-image-api.md
 
 import { APIError } from '../errors/api';
+import { DEFAULT_API_TIMEOUT_MS, resolveTimeout, timeoutSignal } from './timeout';
 
 export interface OpenAIClient {
   apiKey: string;
@@ -54,14 +55,23 @@ export interface ImageResponse {
 }
 
 async function postBearer<T>(client: OpenAIClient, path: string, body: unknown): Promise<T> {
-  const res = await fetch(`${client.baseUrl}${path}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${client.apiKey}`,
-    },
-    body: JSON.stringify(body),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${client.baseUrl}${path}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${client.apiKey}`,
+      },
+      body: JSON.stringify(body),
+      signal: timeoutSignal(DEFAULT_API_TIMEOUT_MS),
+    });
+  } catch (e) {
+    if (e instanceof Error && e.name === 'TimeoutError') {
+      throw new APIError(`Request timed out after ${resolveTimeout(DEFAULT_API_TIMEOUT_MS)}ms (set PIAPI_TIMEOUT_MS to override)`, 0, 'TIMEOUT');
+    }
+    throw e;
+  }
 
   const text = await res.text();
   if (!res.ok) {

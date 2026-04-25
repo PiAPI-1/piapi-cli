@@ -1,6 +1,5 @@
 import { existsSync } from 'node:fs';
 import { defineCommand } from '../../command';
-import { isLoggedIn } from '../../auth/status';
 import type { GlobalFlags } from '../../types/flags';
 import { getFormatter } from '../../output/formatter';
 import { formatJSON } from '../../output/json';
@@ -12,7 +11,9 @@ export default defineCommand({
   name: 'auth status',
   description: 'Check if you are logged in',
   async execute(config, flags: GlobalFlags) {
-    const loggedIn = isLoggedIn();
+    // Use the resolved config (flag → env → file), not the raw file. Otherwise
+    // `piapi --api-key sk-x auth status` would falsely report "not logged in".
+    const loggedIn = !!config.apiKey;
     const formatter = getFormatter(flags);
 
     if (formatter === 'json') {
