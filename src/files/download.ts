@@ -6,6 +6,23 @@ export interface DownloadOptions {
   quiet?: boolean;
 }
 
+// Decode an OpenAI-style `b64_json` payload to disk under the same outDir
+// rules as downloadUrl(). Filename is caller-supplied since base64 carries
+// no path info; defaults to a timestamped .png.
+export async function saveBase64(
+  b64: string,
+  filename: string | undefined,
+  opts: DownloadOptions = {},
+): Promise<string> {
+  const dir = opts.outDir ?? process.cwd();
+  await mkdir(dir, { recursive: true });
+  const name = filename || `image-${Date.now()}.png`;
+  const finalPath = join(dir, name);
+  await writeFile(finalPath, Buffer.from(b64, 'base64'));
+  if (!opts.quiet) process.stderr.write(`Saved → ${finalPath}\n`);
+  return finalPath;
+}
+
 // Derive a filename from a URL path; fall back to a timestamped default
 // when the URL has no recognisable file portion (e.g. trailing slash).
 function filenameFromUrl(url: string): string {

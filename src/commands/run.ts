@@ -16,7 +16,7 @@ import {
 import { pollTask } from '../polling/poll';
 import { uploadFile } from '../files/upload';
 import { resolveLocalFiles } from '../files/resolve';
-import { downloadUrl } from '../files/download';
+import { downloadUrl, saveBase64 } from '../files/download';
 import type { GlobalFlags } from '../types/flags';
 import type { CreateTaskRequest } from '../types/api';
 import { getFormatter } from '../output/formatter';
@@ -116,6 +116,11 @@ async function runOpenAIImage(
     return;
   }
   const urls = extractUrls(res.data);
+  // gpt-image-2 with reference image input returns base64 inline (b64_json)
+  // instead of a URL — capture both modes so --download works either way.
+  const b64Items = (res.data ?? [])
+    .map((d, i) => ({ index: i, b64: d.b64_json }))
+    .filter((x): x is { index: number; b64: string } => typeof x.b64 === 'string' && x.b64.length > 0);
   printRunSuccess({
     title: model.name,
     elapsedMs: Date.now() - t0,
@@ -123,10 +128,26 @@ async function runOpenAIImage(
   });
   if (urls.length > 0) {
     for (const { label, url } of urls) process.stdout.write(`data${label}: ${url}\n`);
+  } else if (b64Items.length > 0) {
+    for (const { index, b64 } of b64Items) {
+      process.stdout.write(`data[${index}].b64_json: <${Math.round(b64.length * 3 / 4 / 1024)} KB>\n`);
+    }
   } else {
     process.stdout.write(formatJSON(res) + '\n');
   }
   await maybeDownload(urls.map((u) => u.url), flags);
+  if (flags.download && b64Items.length > 0) {
+    for (const { index, b64 } of b64Items) {
+      try {
+        await saveBase64(b64, `${model.name}-${Date.now()}-${index}.png`, {
+          outDir: flags.outDir, quiet: flags.quiet,
+        });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        process.stderr.write(`Save base64 failed (#${index}): ${msg}\n`);
+      }
+    }
+  }
 }
 
 async function runOpenAIChat(
