@@ -55,6 +55,26 @@ export const MODELS: ModelEntry[] = [
   // docs: https://piapi.ai/docs/midjourney-api/imagine.md
   { name: 'midjourney', type: 'image', model: 'midjourney', taskType: 'imagine', provider: 'Midjourney', verified: true },
 
+  // ========== midjourney variants ==========
+  // docs: https://piapi.ai/docs/midjourney-api/upscale.md
+  { name: 'mj-upscale', type: 'image', model: 'midjourney', taskType: 'upscale', provider: 'Midjourney', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/midjourney-api/variation.md
+  { name: 'mj-variation', type: 'image', model: 'midjourney', taskType: 'variation', provider: 'Midjourney', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/midjourney-api/reroll.md
+  { name: 'mj-reroll', type: 'image', model: 'midjourney', taskType: 'reroll', provider: 'Midjourney', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/midjourney-api/describe.md
+  { name: 'mj-describe', type: 'image', model: 'midjourney', taskType: 'describe', provider: 'Midjourney', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/midjourney-api/seed.md
+  { name: 'mj-seed', type: 'image', model: 'midjourney', taskType: 'seed', provider: 'Midjourney', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/midjourney-api/blend.md
+  { name: 'mj-blend', type: 'image', model: 'midjourney', taskType: 'blend', provider: 'Midjourney', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/midjourney-api/inpaint.md
+  { name: 'mj-inpaint', type: 'image', model: 'midjourney', taskType: 'inpaint', provider: 'Midjourney', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/midjourney-api/outpaint.md
+  { name: 'mj-outpaint', type: 'image', model: 'midjourney', taskType: 'outpaint', provider: 'Midjourney', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/midjourney-api/pan.md
+  { name: 'mj-pan', type: 'image', model: 'midjourney', taskType: 'pan', provider: 'Midjourney', asyncOnly: true, verified: true },
+
   // docs: https://piapi.ai/docs/gemini-api/nano-banana-pro.md
   { name: 'nano-banana-pro', type: 'image', model: 'gemini', taskType: 'nano-banana-pro', provider: 'Gemini', verified: true },
   // docs: https://piapi.ai/docs/gemini-api/nano-banana-2.md
