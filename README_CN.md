@@ -1,6 +1,10 @@
+<p align="center">
+  <img src="docs/banner.png" alt="PiAPI CLI" width="800">
+</p>
+
 # PiAPI CLI
 
-PiAPI 官方 CLI — 在终端或 AI Agent 中调用 80+ 多模态 AI 模型（图像、视频、音频、3D、LLM）。
+PiAPI 官方 CLI — 在终端或 AI Agent 中调用 94 个多模态 AI 模型（图像、视频、音频、3D、LLM）。
 
 ## 安装
 
