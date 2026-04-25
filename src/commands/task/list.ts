@@ -6,6 +6,7 @@ import type { GlobalFlags } from '../../types/flags';
 import { getFormatter } from '../../output/formatter';
 import { formatJSON } from '../../output/json';
 import { formatTable } from '../../output/text';
+import { ANSI, colorEnabled } from '../../output/color';
 import { CLIError } from '../../errors/base';
 import { ExitCode } from '../../errors/codes';
 
@@ -41,7 +42,11 @@ export default defineCommand({
     );
 
     if (active.length === 0) {
+      const useColor = colorEnabled(process.stdout);
+      const arrow = useColor ? `${ANSI.dim}→${ANSI.reset}` : '→';
+      const hint  = useColor ? `${ANSI.dim}piapi run flux-dev prompt="…"${ANSI.reset}` : 'piapi run flux-dev prompt="…"';
       process.stdout.write('No active tasks.\n');
+      process.stdout.write(`${arrow} Try: ${hint}\n`);
       return;
     }
 

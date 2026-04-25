@@ -6,10 +6,15 @@ import { resolveAPIKey } from './auth/resolver';
 import { readConfigFile } from './config/loader';
 import { maybeShowStatusBar } from './output/status-bar';
 import { setNoColor } from './output/color';
+import { stopAllSpinners } from './output/progress';
 
 const VERSION = '0.1.0';
 
-process.on('SIGINT', () => { process.stderr.write('\nInterrupted.\n'); process.exit(130); });
+process.on('SIGINT', () => {
+  stopAllSpinners();
+  process.stderr.write('\nInterrupted.\n');
+  process.exit(130);
+});
 process.stdout.on('error', (e: NodeJS.ErrnoException) => { if (e.code === 'EPIPE') process.exit(0); throw e; });
 
 import authLogin from './commands/auth/login';
