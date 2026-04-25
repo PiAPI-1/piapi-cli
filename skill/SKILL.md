@@ -56,7 +56,22 @@ piapi run sora2-pro prompt="waves" --async
 piapi run gpt-image-2 prompt="a robot" size=1024x1024
 piapi run gpt-4o prompt="explain async/await in JS"
 piapi run flux-dev prompt="test" --dry-run
+
+# Local file in / file out (paid plan required for upload):
+piapi run remove-bg image=@./photo.png --download --out-dir ./out
+piapi run faceswap target_image=@./me.jpg swap_image=@./friend.jpg --download
 ```
+
+**Local files**: any `key=@./path/to/file` is auto-uploaded to PiAPI's
+ephemeral resource endpoint and rewritten to a temporary URL before the
+request goes out. Bare URLs (`key=https://…`) are passed through. The
+upload requires a paid PiAPI plan; on free plans you get a clear hint
+to use a public URL instead.
+
+**Auto-download**: with `--download`, every URL the result yields is
+written to disk under `--out-dir` (default cwd). Filenames come from
+the URL path; existing files are overwritten. Stderr logs `Saved → …`
+per file; stdout still shows the URL lines for grepping.
 
 | Flag | Description |
 |---|---|
@@ -64,8 +79,8 @@ piapi run flux-dev prompt="test" --dry-run
 | `--stream` | Stream LLM output as it arrives (openai-completions only) |
 | `--dry-run` | Print request body without sending |
 | `--webhook <url>` | Webhook for unified-API completion callbacks |
-| `--out-dir <path>` | Download outputs to directory |
-| `--download` | Auto-download when task completes |
+| `--out-dir <path>` | Download outputs to directory (default: cwd) |
+| `--download` | Save every result URL to disk after the task completes |
 
 **Models** (94 entries, every one verified against PiAPI docs).
 For the full live list, run `piapi model list` — the catalog is the

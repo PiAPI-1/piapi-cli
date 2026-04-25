@@ -14,6 +14,9 @@ import {
   type ImageRequest,
 } from '../client/openai-compat';
 import { pollTask } from '../polling/poll';
+import { uploadFile } from '../files/upload';
+import { resolveLocalFiles } from '../files/resolve';
+import { downloadUrl } from '../files/download';
 import type { GlobalFlags } from '../types/flags';
 import type { CreateTaskRequest } from '../types/api';
 import { getFormatter } from '../output/formatter';
@@ -21,6 +24,23 @@ import { formatJSON } from '../output/json';
 import { withSpinner } from '../output/progress';
 import { CLIError } from '../errors/base';
 import { ExitCode } from '../errors/codes';
+
+// Walk the (possibly URL-bearing) results and download each one when the
+// user passed --download. Best-effort: a single download failure logs to
+// stderr but does not abort the rest of the batch — partial saves are
+// still useful, and the URLs themselves remain visible in stdout.
+async function maybeDownload(urls: string[], flags: GlobalFlags): Promise<void> {
+  if (!flags.download || urls.length === 0) return;
+  const dedup = [...new Set(urls)];
+  for (const url of dedup) {
+    try {
+      await downloadUrl(url, { outDir: flags.outDir, quiet: flags.quiet });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      process.stderr.write(`Download failed: ${url} (${msg})\n`);
+    }
+  }
+}
 
 function extractUrls(value: unknown, path = ''): { label: string; url: string }[] {
   if (value == null) return [];
@@ -102,6 +122,7 @@ async function runOpenAIImage(
   if (res.usage?.total_tokens) {
     process.stderr.write(`Usage: ${res.usage.total_tokens} tokens\n`);
   }
+  await maybeDownload(urls.map((u) => u.url), flags);
 }
 
 async function runOpenAIChat(
@@ -198,6 +219,7 @@ async function runOpenAIChatStream(
       `Usage: ${usage.total_tokens} tokens (in ${usage.prompt_tokens}, out ${usage.completion_tokens})\n`,
     );
   }
+  await maybeDownload(urls, flags);
 }
 
 async function runUnified(
@@ -281,6 +303,7 @@ async function runUnified(
   if (finalTask.meta?.usage) {
     process.stderr.write(`Usage: ${finalTask.meta.usage.consume} ${finalTask.meta.usage.type}s\n`);
   }
+  await maybeDownload(urls.map((u) => u.url), flags);
 }
 
 export default defineCommand({
@@ -307,7 +330,7 @@ export default defineCommand({
 
     const kvArgs = (flags._positional ?? []).slice(1);
     const userInput = parseInput(kvArgs);
-    const input = { ...(model.defaultInput ?? {}), ...userInput };
+    let input = { ...(model.defaultInput ?? {}), ...userInput };
 
     const baseUrl = flags.baseUrl ?? config.baseUrl ?? 'https://api.piapi.ai';
 
@@ -317,6 +340,37 @@ export default defineCommand({
       apiKey = resolveAPIKey(flags.apiKey) ?? config.apiKey ?? '';
       if (!apiKey) {
         throw new CLIError('No API key. Run: piapi auth login --api-key sk-...', ExitCode.AUTH);
+      }
+    }
+
+    // Auto-upload `@<path>` values to PiAPI's ephemeral resource endpoint
+    // and rewrite the input with the returned URLs. Skipped in dry-run so
+    // users can see the request shape without consuming credits or network.
+    if (!flags.dryRun) {
+      try {
+        const resolved = await resolveLocalFiles(input, async (p) => {
+          return withSpinner(
+            `Uploading ${p.split('/').pop()}…`,
+            { quiet: flags.quiet },
+            () => uploadFile(apiKey, p),
+          );
+        });
+        input = resolved.input;
+        if (!flags.quiet && resolved.uploads.length > 0) {
+          for (const u of resolved.uploads) {
+            process.stderr.write(`Uploaded ${u.path} → ${u.url}\n`);
+          }
+        }
+      } catch (e) {
+        if (e instanceof CLIError) throw e;
+        const msg = e instanceof Error ? e.message : String(e);
+        // Surface the common "plan not allowed" 403 as a usage error with a
+        // concrete next step rather than a raw exception trace.
+        if (/not allowed|plan|upgrade/i.test(msg)) {
+          throw new CLIError(msg, ExitCode.AUTH,
+            `File upload requires a paid PiAPI plan. Upload to your own bucket and pass the URL as image_url=https://… instead.`);
+        }
+        throw new CLIError(`Upload failed: ${msg}`, ExitCode.NETWORK);
       }
     }
 

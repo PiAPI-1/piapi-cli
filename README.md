@@ -51,7 +51,13 @@ piapi run sora2-pro prompt="waves" --async
 piapi run gpt-image-2 prompt="a robot" size=1024x1024
 piapi run gpt-4o prompt="hello, world"
 piapi run flux-dev prompt="test" --dry-run
+
+# Local file → upload → result → auto-download (paid plan required for upload):
+piapi run remove-bg image=@./photo.png --download --out-dir ./out
 ```
+
+Use `key=@./path` to upload a local file before the request runs;
+add `--download` to save every result URL to `--out-dir` (default cwd).
 
 ### piapi task
 
