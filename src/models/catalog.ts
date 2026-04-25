@@ -13,14 +13,23 @@
 
 export type ModelType = 'image' | 'video' | 'audio' | '3d' | 'llm';
 
+// PiAPI exposes two API surfaces:
+//   - 'unified'           → POST /api/v1/task   {model, task_type, input}
+//                           X-API-Key auth, async task lifecycle, envelope.
+//   - 'openai-completions'→ POST /v1/chat/completions  (Bearer auth, sync, no envelope)
+//   - 'openai-images'     → POST /v1/images/generations (Bearer auth, sync, no envelope)
+// Default is 'unified' when omitted.
+export type ApiType = 'unified' | 'openai-completions' | 'openai-images';
+
 export interface ModelEntry {
   name: string;          // user-facing alias
   type: ModelType;
-  model: string;         // piapi unified API `model` field
-  taskType: string;      // piapi unified API `task_type` field
+  model: string;         // request `model` field (unified or openai-compat)
+  taskType?: string;     // unified API `task_type` (omit for openai-compat)
   provider: string;      // display label
+  apiType?: ApiType;     // default 'unified'
   asyncOnly?: boolean;
-  defaultInput?: Record<string, unknown>;  // merged into request input (user values win)
+  defaultInput?: Record<string, unknown>;  // merged into request input/body (user values win)
   verified?: boolean;    // true = real `model` string verified against piapi docs
 }
 
@@ -91,6 +100,23 @@ export const MODELS: ModelEntry[] = [
   { name: 'trellis', type: '3d', model: 'Qubico/trellis', taskType: 'text-to-3d', provider: 'Trellis', asyncOnly: true, verified: true },
   // docs: https://piapi.ai/docs/trellis2-api/create-task.md
   { name: 'trellis2', type: '3d', model: 'Qubico/trellis2', taskType: 'image-to-3d', provider: 'Trellis', asyncOnly: true, verified: true },
+
+  // ========== OpenAI-compat: GPT image ==========
+  // docs: https://piapi.ai/docs/gpt-image/gpt-image-api.md
+  { name: 'gpt-image-2', type: 'image', model: 'gpt-image-2-preview', provider: 'OpenAI', apiType: 'openai-images', verified: true },
+  { name: 'gpt-image-1.5', type: 'image', model: 'gpt-image-1.5', provider: 'OpenAI', apiType: 'openai-images', verified: true },
+  { name: 'gpt-image-1', type: 'image', model: 'gpt-image-1', provider: 'OpenAI', apiType: 'openai-images', verified: true },
+
+  // ========== OpenAI-compat: LLM completions ==========
+  // docs: https://piapi.ai/docs/llm-api/completions.md
+  { name: 'gpt-5', type: 'llm', model: 'gpt-5', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
+  { name: 'gpt-5.2', type: 'llm', model: 'gpt-5.2', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
+  { name: 'gpt-4o', type: 'llm', model: 'gpt-4o', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
+  { name: 'gpt-4o-mini', type: 'llm', model: 'gpt-4o-mini', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
+  { name: 'gpt-4.1', type: 'llm', model: 'gpt-4.1', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
+  { name: 'claude-opus-4.6', type: 'llm', model: 'claude-opus-4-6', provider: 'Anthropic', apiType: 'openai-completions', verified: true },
+  { name: 'claude-sonnet-4.6', type: 'llm', model: 'claude-sonnet-4-6', provider: 'Anthropic', apiType: 'openai-completions', verified: true },
+  { name: 'gemini-2.5-flash', type: 'llm', model: 'gemini-2.5-flash-nothinking', provider: 'Google', apiType: 'openai-completions', verified: true },
 ];
 
 export function getModel(name: string): ModelEntry | undefined {
