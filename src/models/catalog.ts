@@ -93,12 +93,15 @@ export const MODELS: ModelEntry[] = [
 
   // docs: https://piapi.ai/docs/veo3-api/text-to-video.md
   { name: 'veo3', type: 'video', model: 'veo3', taskType: 'veo3-video', provider: 'Veo', asyncOnly: true, verified: true },
+  // veo3-video-fast is the faster/cheaper speed tier of veo3 (works for both
+  // text-to-video and image-to-video — pass image_url in input for i2v).
   // docs: https://piapi.ai/docs/veo3-api/image-to-video.md
-  { name: 'veo3-img2vid', type: 'video', model: 'veo3', taskType: 'veo3-video-fast', provider: 'Veo', asyncOnly: true, verified: true },
+  { name: 'veo3-fast', type: 'video', model: 'veo3', taskType: 'veo3-video-fast', provider: 'Veo', asyncOnly: true, verified: true },
   // docs: https://piapi.ai/docs/veo31-api/text-to-video.md
   { name: 'veo3.1', type: 'video', model: 'veo3.1', taskType: 'veo3.1-video', provider: 'Veo', asyncOnly: true, verified: true },
+  // veo3.1-video-fast is the faster/cheaper speed tier (t2v + i2v).
   // docs: https://piapi.ai/docs/veo31-api/image-to-video.md
-  { name: 'veo3.1-img2vid', type: 'video', model: 'veo3.1', taskType: 'veo3.1-video-fast', provider: 'Veo', asyncOnly: true, verified: true },
+  { name: 'veo3.1-fast', type: 'video', model: 'veo3.1', taskType: 'veo3.1-video-fast', provider: 'Veo', asyncOnly: true, verified: true },
 
   // docs: https://piapi.ai/docs/kling-api/kling-3-api.md
   { name: 'kling-3', type: 'video', model: 'kling', taskType: 'video_generation', provider: 'Kling', asyncOnly: true, defaultInput: { version: '3.0' }, verified: true },
