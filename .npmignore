@@ -1,0 +1,14 @@
+src/
+test/
+docs/
+skill/
+.github/
+build.ts
+tsconfig.json
+eslint.config.js
+bun.lock
+.gitignore
+.npmignore
+PLAN.md
+AGENTS.md
+README_CN.md
