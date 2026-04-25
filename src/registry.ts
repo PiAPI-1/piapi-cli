@@ -69,35 +69,70 @@ class Registry {
     out.write('\n');
   }
 
-  private bold = (s: string, out: NodeJS.WriteStream) => out.isTTY ? `\x1b[1m${s}\x1b[0m` : s;
-  private dim  = (s: string, out: NodeJS.WriteStream) => out.isTTY ? `\x1b[2m${s}\x1b[0m` : s;
+  private bold   = (s: string, out: NodeJS.WriteStream) => out.isTTY ? `\x1b[1m${s}\x1b[0m` : s;
+  private dim    = (s: string, out: NodeJS.WriteStream) => out.isTTY ? `\x1b[2m${s}\x1b[0m` : s;
+  private accent = (s: string, out: NodeJS.WriteStream) => out.isTTY ? `\x1b[1;38;2;30;110;220m${s}\x1b[0m` : s;
+
+  // 6-row pure-blue gradient: deep navy → bright blue (no purple, no cyan).
+  private static readonly LOGO = [
+    '██████╗ ██╗ █████╗ ██████╗ ██╗',
+    '██╔══██╗██║██╔══██╗██╔══██╗██║',
+    '██████╔╝██║███████║██████╔╝██║',
+    '██╔═══╝ ██║██╔══██║██╔═══╝ ██║',
+    '██║     ██║██║  ██║██║     ██║',
+    '╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝',
+  ];
+  private static readonly GRADIENT: [number, number, number][] = [
+    [  8,  30, 100],
+    [ 16,  54, 130],
+    [ 24,  78, 160],
+    [ 32, 102, 190],
+    [ 42, 126, 220],
+    [ 50, 150, 250],
+  ];
 
   private printRoot(out: NodeJS.WriteStream): void {
-    out.write(`\nUsage: piapi <resource> <command> [flags]
+    out.write('\n');
+    for (let i = 0; i < Registry.LOGO.length; i++) {
+      const line = Registry.LOGO[i]!;
+      if (out.isTTY) {
+        const [r, g, b] = Registry.GRADIENT[i]!;
+        out.write(`\x1b[1;38;2;${r};${g};${b}m${line}\x1b[0m\n`);
+      } else {
+        out.write(line + '\n');
+      }
+    }
 
-Resources:
-  auth       Authentication (login, status, logout)
-  config     CLI configuration (show, set)
-  quota      Account quota and credits
-  run        Run a model task
-  task       Task management (list, get, cancel)
-  model      Model discovery (list, schema)
+    const b = (s: string) => this.bold(s, out);
+    const a = (s: string) => this.accent(s, out);
+    const d = (s: string) => this.dim(s, out);
 
-Global Flags:
-  --api-key <key>        API key (overrides env/config)
-  --base-url <url>       API base URL
-  --output <format>      Output format: json, text
-  --quiet                Suppress progress indicators
-  --non-interactive      Fail when input is needed
-  --async                Return task ID without polling
-  --dry-run              Show request without executing
-  --webhook <url>        Webhook URL for callbacks
-  --out-dir <path>       Output directory for downloads
-  --download             Auto-download outputs
-  --version              Print version
-  --help                 Show help
+    out.write(`
+${b('Usage:')} piapi <resource> <command> [flags]
 
-Run "piapi help <command>" for command-specific help.
+${b('Resources:')}
+  ${a('auth')}       ${d('Authentication (login, status, logout)')}
+  ${a('config')}     ${d('CLI configuration (show, set)')}
+  ${a('quota')}      ${d('Account quota and credits')}
+  ${a('run')}        ${d('Run a model task')}
+  ${a('task')}       ${d('Task management (list, get, cancel)')}
+  ${a('model')}      ${d('Model discovery (list, schema)')}
+
+${b('Global Flags:')}
+  ${a('--api-key <key>')}        ${d('API key (overrides env/config)')}
+  ${a('--base-url <url>')}       ${d('API base URL')}
+  ${a('--output <format>')}      ${d('Output format: json, text')}
+  ${a('--quiet')}                ${d('Suppress progress indicators')}
+  ${a('--non-interactive')}      ${d('Fail when input is needed')}
+  ${a('--async')}                ${d('Return task ID without polling')}
+  ${a('--dry-run')}              ${d('Show request without executing')}
+  ${a('--webhook <url>')}        ${d('Webhook URL for callbacks')}
+  ${a('--out-dir <path>')}       ${d('Output directory for downloads')}
+  ${a('--download')}             ${d('Auto-download outputs')}
+  ${a('--version')}              ${d('Print version')}
+  ${a('--help')}                 ${d('Show help')}
+
+${d(`Run "piapi help <command>" for command-specific help.`)}
 `);
   }
 
