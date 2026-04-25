@@ -22,6 +22,7 @@ import type { CreateTaskRequest } from '../types/api';
 import { getFormatter } from '../output/formatter';
 import { formatJSON } from '../output/json';
 import { withSpinner } from '../output/progress';
+import { printRunSuccess, printRunPending } from '../output/run-status';
 import { CLIError } from '../errors/base';
 import { ExitCode } from '../errors/codes';
 
@@ -103,6 +104,7 @@ async function runOpenAIImage(
     process.stderr.write(`[DRY RUN] Body: ${formatJSON(body)}\n`);
     return;
   }
+  const t0 = Date.now();
   const res = await withSpinner(
     `Generating image (${model.name})…`,
     { quiet: flags.quiet },
@@ -114,13 +116,15 @@ async function runOpenAIImage(
     return;
   }
   const urls = extractUrls(res.data);
+  printRunSuccess({
+    title: model.name,
+    elapsedMs: Date.now() - t0,
+    extra: res.usage?.total_tokens ? `${res.usage.total_tokens} tokens` : undefined,
+  });
   if (urls.length > 0) {
     for (const { label, url } of urls) process.stdout.write(`data${label}: ${url}\n`);
   } else {
     process.stdout.write(formatJSON(res) + '\n');
-  }
-  if (res.usage?.total_tokens) {
-    process.stderr.write(`Usage: ${res.usage.total_tokens} tokens\n`);
   }
   await maybeDownload(urls.map((u) => u.url), flags);
 }
@@ -247,7 +251,7 @@ async function runUnified(
 
   if (flags.async || model.asyncOnly) {
     const task = await withSpinner(
-      'Creating task...',
+      'Creating task…',
       { quiet: flags.quiet },
       () => createTask({ apiKey, baseUrl }, req),
     );
@@ -255,14 +259,19 @@ async function runUnified(
     if (formatter === 'json') {
       process.stdout.write(formatJSON({ task_id: task.task_id, status: task.status }) + '\n');
     } else {
-      process.stdout.write(`Task created: ${task.task_id} (${task.status})\n`);
-      process.stdout.write(`Check status: piapi task get ${task.task_id}\n`);
+      printRunPending({
+        title: model.name,
+        taskId: task.task_id,
+        status: task.status,
+        hint: `piapi task get ${task.task_id}`,
+      });
     }
     return;
   }
 
+  const t0 = Date.now();
   const created = await withSpinner(
-    'Creating task...',
+    'Creating task…',
     { quiet: flags.quiet },
     () => createTask({ apiKey, baseUrl }, req),
   );
@@ -289,19 +298,21 @@ async function runUnified(
     throw new CLIError(`Task ${taskId} failed: ${err}`, ExitCode.API_ERROR);
   }
 
-  process.stdout.write(`Task ${taskId} completed.\n`);
   const out = finalTask.output;
   // Output schema varies per model (image_url, video, model_file, works[].audio…).
   // Walk the tree and print every http(s) URL with its key path; fall back to
   // raw JSON if no URLs found so the user still sees the result.
   const urls = extractUrls(out);
+  const usage = finalTask.meta?.usage;
+  printRunSuccess({
+    title: model.name,
+    elapsedMs: Date.now() - t0,
+    extra: usage ? `${usage.consume} ${usage.type}s` : undefined,
+  });
   if (urls.length > 0) {
     for (const { label, url } of urls) process.stdout.write(`${label}: ${url}\n`);
   } else if (out) {
     process.stdout.write(formatJSON(out) + '\n');
-  }
-  if (finalTask.meta?.usage) {
-    process.stderr.write(`Usage: ${finalTask.meta.usage.consume} ${finalTask.meta.usage.type}s\n`);
   }
   await maybeDownload(urls.map((u) => u.url), flags);
 }
