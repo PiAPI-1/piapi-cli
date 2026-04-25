@@ -1,7 +1,7 @@
 {
   "name": "piapi-cli",
   "version": "0.1.0",
-  "description": "Official CLI for the PiAPI platform — call 80+ multimodal AI models (image, video, audio, 3D, LLM) from your terminal or AI agent",
+  "description": "Official CLI for the PiAPI platform — call 94 multimodal AI models (image, video, audio, 3D, LLM) from your terminal or AI agent",
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -40,7 +40,7 @@
   "homepage": "https://piapi.ai",
   "repository": {
     "type": "git",
-    "url": "https://github.com/PiAPI-Official/piapi-cli.git"
+    "url": "https://github.com/legnext-ai/piapi-cli.git"
   },
   "license": "MIT",
   "dependencies": {

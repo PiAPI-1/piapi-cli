@@ -10,3 +10,4 @@ dist/
 *.tsbuildinfo
 EXECUTOR_PROMPT*.md
 .codex
+PLAN.md
