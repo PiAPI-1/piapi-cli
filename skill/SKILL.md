@@ -1,11 +1,11 @@
 ---
 name: piapi-cli
-description: Use piapi to call 89 multimodal AI models — image (flux/midjourney/qwen/nano-banana/seedream/z-image/gpt-image), video (sora2/veo3/kling/hailuo/wan/seedance/skyreels/framepack/hunyuan/luma/omni-human/ai-hug), audio (udio/ace-step/mmaudio/diffrhythm/f5-tts), 3D (trellis), LLM (gpt/claude/gemini) — from the terminal. Auto-routes between PiAPI's unified task API and OpenAI-compatible endpoints. Supports key=value inputs, async tasks, polling, and webhook callbacks.
+description: Use piapi to call 94 multimodal AI models — image (flux/midjourney/qwen/nano-banana/seedream/z-image/gpt-image), video (sora2/veo3/kling/hailuo/wan/seedance/skyreels/framepack/hunyuan/luma/omni-human/ai-hug), audio (udio/ace-step/mmaudio/diffrhythm/f5-tts), 3D (trellis), LLM (gpt/claude/gemini) — from the terminal. Auto-routes between PiAPI's unified task API and OpenAI-compatible endpoints. Supports key=value inputs, async tasks, polling, and webhook callbacks.
 ---
 
 # PiAPI CLI — Agent Skill Guide
 
-Use `piapi` to call 80+ multimodal AI models via the PiAPI unified API.
+Use `piapi` to call 94 multimodal AI models via the PiAPI unified API.
 
 ## Prerequisites
 
@@ -109,13 +109,12 @@ source of truth. Highlights below:
   `mmaudio`, `diffrhythm`, `f5-tts`
 - **3D** (async unified): `trellis`, `trellis2`
 - **LLM** (OpenAI-compat): `gpt-5`, `gpt-5.2`, `gpt-4o`, `gpt-4o-mini`,
-  `gpt-4.1`, `claude-opus-4.6`, `claude-sonnet-4.6`, `gemini-2.5-flash`
+  `gpt-4.1`, `claude-opus-4.6`, `claude-sonnet-4.6`, `gemini-2.5-flash-nothinking`
 
 ### piapi task list
 
 ```bash
 piapi task list
-piapi task list --status running --limit 10
 ```
 
 ### piapi task get \<id\>

@@ -6,7 +6,6 @@ import { getFormatter } from '../../output/formatter';
 import { formatJSON } from '../../output/json';
 import { withSpinner } from '../../output/progress';
 import { renderQuotaPanel } from '../../output/quota-panel';
-import type { AccountInfo } from '../../types/api';
 import { CLIError } from '../../errors/base';
 import { ExitCode } from '../../errors/codes';
 
@@ -27,7 +26,7 @@ export default defineCommand({
     const data = await withSpinner(
       'Fetching account info…',
       { quiet: flags.quiet },
-      () => getAccountInfo({ apiKey, baseUrl }) as Promise<AccountInfo>,
+      () => getAccountInfo({ apiKey, baseUrl }),
     );
 
     const formatter = getFormatter(flags);

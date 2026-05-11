@@ -19,7 +19,7 @@ export async function uploadFile(apiKey: string, filePath: string): Promise<Uplo
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
+        'X-API-Key': apiKey,
       },
       body: JSON.stringify({ file_name: filename, file_data: b64 }),
       signal: timeoutSignal(DEFAULT_TRANSFER_TIMEOUT_MS),

@@ -6,6 +6,14 @@ export interface TaskResponse {
 
 export type TaskStatus = 'pending' | 'staged' | 'processing' | 'running' | 'completed' | 'failed' | 'cancelled';
 
+// A task in any of these states will not change further. Centralised so the
+// polling loop and any future status renderer share one source of truth.
+export const TERMINAL_STATUSES: ReadonlySet<TaskStatus> = new Set(['completed', 'failed', 'cancelled']);
+
+export function isTerminalStatus(status: TaskStatus): boolean {
+  return TERMINAL_STATUSES.has(status);
+}
+
 export interface TaskError {
   code: number;
   message: string;

@@ -45,6 +45,23 @@ describe('catalog integrity', () => {
     }
   });
 
+  test('streamingOnly entries are openai-completions (dispatch invariant)', () => {
+    for (const m of MODELS) {
+      if (m.streamingOnly === true) {
+        expect(m.apiType, `${m.name} marked streamingOnly but apiType=${m.apiType ?? 'unified'}`).toBe('openai-completions');
+      }
+    }
+  });
+
+  test('asyncOnly entries are unified (dispatch invariant)', () => {
+    for (const m of MODELS) {
+      if (m.asyncOnly === true) {
+        const surface = m.apiType ?? 'unified';
+        expect(surface, `${m.name} marked asyncOnly but apiType=${m.apiType}`).toBe('unified');
+      }
+    }
+  });
+
   test('no duplicate model names', () => {
     const seen = new Set<string>();
     const dupes: string[] = [];

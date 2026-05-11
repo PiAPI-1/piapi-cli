@@ -243,7 +243,7 @@ export const MODELS: ModelEntry[] = [
   { name: 'gpt-4.1', type: 'llm', model: 'gpt-4.1', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
   { name: 'claude-opus-4.6', type: 'llm', model: 'claude-opus-4-6', provider: 'Anthropic', apiType: 'openai-completions', verified: true },
   { name: 'claude-sonnet-4.6', type: 'llm', model: 'claude-sonnet-4-6', provider: 'Anthropic', apiType: 'openai-completions', verified: true },
-  { name: 'gemini-2.5-flash', type: 'llm', model: 'gemini-2.5-flash-nothinking', provider: 'Google', apiType: 'openai-completions', verified: true },
+  { name: 'gemini-2.5-flash-nothinking', type: 'llm', model: 'gemini-2.5-flash-nothinking', provider: 'Google', apiType: 'openai-completions', verified: true },
 
   // ========== OpenAI-compat: Sora2 streaming ==========
   // PiAPI wraps sora2 video generation as a streamed chat completion;

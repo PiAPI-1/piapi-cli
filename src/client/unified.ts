@@ -1,5 +1,5 @@
 import { request } from './http';
-import type { CreateTaskRequest, TaskData } from '../types/api';
+import type { CreateTaskRequest, TaskData, AccountInfo } from '../types/api';
 import { Endpoints } from './endpoints';
 
 export interface UnifiedClient {
@@ -26,8 +26,8 @@ export async function getTask(client: UnifiedClient, taskId: string): Promise<Ta
   });
 }
 
-export async function getAccountInfo(client: UnifiedClient): Promise<unknown> {
-  return request({
+export async function getAccountInfo(client: UnifiedClient): Promise<AccountInfo> {
+  return request<AccountInfo>({
     method: 'GET',
     path: Endpoints.ACCOUNT_INFO,
     apiKey: client.apiKey,

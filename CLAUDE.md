@@ -59,6 +59,6 @@ bun test          # 15 tests / 0 fail，CI gate
 
 - **VERSION 不要硬编码**，必须 `process.env.CLI_VERSION ?? '0.0.0-dev'`，由 `build.ts` define 注入
 - **`registry.printRoot` 不要硬编码 flag 列表**，从 `GLOBAL_OPTIONS` 迭代渲染
-- **`models/schema.ts` 只覆盖 8/94 条目**，`model schema <X>` 错误消息要区分"unknown model"和"no schema defined"
+- **`models/schema.ts` 只覆盖 7/94 条目**，`model schema <X>` 错误消息要区分"unknown model"和"no schema defined"
 - **流式 chat 的 `usage` 可能是 `{}`**，必须 `typeof usage?.total_tokens === 'number'` 才打印
 - **`status-bar.ts` 模块级 `printed` 是设计意图**（一次启动只打一次 banner），别"修复"

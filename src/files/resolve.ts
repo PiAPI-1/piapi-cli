@@ -6,7 +6,7 @@
 // Upload uses POST https://upload.theapi.app/api/ephemeral_resource —
 // see src/files/upload.ts and https://piapi.ai/docs/tools/file-upload.md.
 
-import { existsSync } from 'node:fs';
+import { existsSync, lstatSync } from 'node:fs';
 import { resolve as resolvePath } from 'node:path';
 import { CLIError } from '../errors/base';
 import { ExitCode } from '../errors/codes';
@@ -40,6 +40,24 @@ export async function resolveLocalFiles(
         `Local file not found: ${rawPath}`,
         ExitCode.USAGE,
         `The @ prefix uploads a local file. Check the path or pass a URL directly.`,
+      );
+    }
+
+    // lstat (not stat) so symlinks themselves get rejected — we don't want
+    // an `@/dev/urandom` or `@/proc/self/mem` smuggled in via a symlink.
+    const st = lstatSync(absPath);
+    if (st.isSymbolicLink()) {
+      throw new CLIError(
+        `Refusing to upload symlink: ${rawPath}`,
+        ExitCode.USAGE,
+        `Pass the real file path instead of a symlink.`,
+      );
+    }
+    if (!st.isFile()) {
+      throw new CLIError(
+        `Not a regular file: ${rawPath}`,
+        ExitCode.USAGE,
+        `Only plain files are uploadable (directories, devices, pipes are not).`,
       );
     }
 

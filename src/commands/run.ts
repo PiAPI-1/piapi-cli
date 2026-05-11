@@ -18,7 +18,7 @@ import { uploadFile } from '../files/upload';
 import { resolveLocalFiles } from '../files/resolve';
 import { downloadUrl, saveBase64 } from '../files/download';
 import type { GlobalFlags } from '../types/flags';
-import type { CreateTaskRequest } from '../types/api';
+import { isTerminalStatus, type CreateTaskRequest } from '../types/api';
 import { getFormatter } from '../output/formatter';
 import { formatJSON } from '../output/json';
 import { withSpinner } from '../output/progress';
@@ -304,7 +304,7 @@ async function runUnified(
 
   const finalTask = await pollTask(
     async () => getTask({ apiKey, baseUrl }, taskId),
-    (t) => t.status === 'completed' || t.status === 'failed' || t.status === 'cancelled',
+    (t) => isTerminalStatus(t.status),
     {
       quiet: flags.quiet,
       label: `Running ${model.name}…`,
@@ -353,7 +353,7 @@ export default defineCommand({
     'piapi run flux-dev prompt="a corgi" aspect_ratio=16:9',
     'piapi run gpt-image-2 prompt="a robot" size=1024x1024',
     'piapi run gpt-4o prompt="explain async/await in JS"',
-    'piapi run claude-opus-4.6 prompt="rewrite this" --stream',
+    'piapi run claude-sonnet-4.6 prompt="rewrite this" --stream',
     'piapi run sora2-pro prompt="a sunset" --async',
     'piapi run flux-dev prompt="test" --dry-run',
   ],

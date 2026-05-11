@@ -25,7 +25,16 @@
 ## 安装
 
 ```bash
-npm install -g piapi-cli
+npm install -g piapi-cli      # npm
+pnpm add -g piapi-cli         # pnpm
+bun add -g piapi-cli          # bun
+yarn global add piapi-cli     # yarn
+```
+
+或者不安装直接运行：
+
+```bash
+npx piapi-cli@latest --help
 ```
 
 需要 [Node.js](https://nodejs.org) 18+。
@@ -109,6 +118,8 @@ piapi auth login --api-key sk-xxxxx
 piapi auth status
 piapi auth logout
 ```
+
+> 💡 共享机器上建议用 `export PIAPI_API_KEY=sk-...`，避免 `--api-key` 通过 `ps` 暴露给其他用户。
 
 ### piapi config
 

@@ -25,7 +25,16 @@
 ## Install
 
 ```bash
-npm install -g piapi-cli
+npm install -g piapi-cli      # npm
+pnpm add -g piapi-cli         # pnpm
+bun add -g piapi-cli          # bun
+yarn global add piapi-cli     # yarn
+```
+
+Or run without installing:
+
+```bash
+npx piapi-cli@latest --help
 ```
 
 Requires [Node.js](https://nodejs.org) 18+.
@@ -109,6 +118,9 @@ piapi auth login --api-key sk-xxxxx
 piapi auth status
 piapi auth logout
 ```
+
+> 💡 On shared machines, prefer `export PIAPI_API_KEY=sk-...` over `--api-key`.
+> Command-line args are visible to other local users via `ps`.
 
 ### piapi config
 
