@@ -90,7 +90,6 @@ piapi run faceswap source=@./face.jpg target=@./scene.png --async
 
 ```bash
 piapi task list
-piapi task list --status running
 piapi task get <id>
 piapi task cancel <id>   # 仅部分提供方支持（Kling/Midjourney）；v1 会返回提示
 ```
@@ -167,7 +166,7 @@ piapi quota
 适用于 Claude Code、Cursor 等 Agent：
 
 ```bash
-npx skills add legnext-ai/piapi-cli
+npx skills add PiAPI-1/piapi-cli
 ```
 
 完整 Agent Skill 规范见 [`skill/SKILL.md`](skill/SKILL.md)。

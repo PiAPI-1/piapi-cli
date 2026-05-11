@@ -17,7 +17,10 @@ export default defineCommand({
     const formatter = getFormatter(flags);
 
     if (formatter === 'json') {
-      process.stdout.write(formatJSON(cfg) + '\n');
+      // Never emit the raw key — `config show` is a diagnostic surface, not a
+      // credential exporter, and JSON is the most likely target for logs/CI.
+      const redacted = { ...cfg, apiKey: cfg.apiKey ? maskToken(cfg.apiKey) : undefined };
+      process.stdout.write(formatJSON(redacted) + '\n');
       return;
     }
 

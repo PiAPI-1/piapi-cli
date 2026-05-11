@@ -26,8 +26,10 @@ export function readConfigFile(): Config {
 }
 
 export function writeConfigFile(config: Config): void {
-  mkdirSync(CONFIG_DIR, { recursive: true });
-  writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+  // chmod 700 / 600 — the file stores the API key; on shared machines a
+  // world-readable config means every local user can exfiltrate it.
+  mkdirSync(CONFIG_DIR, { recursive: true, mode: 0o700 });
+  writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), { mode: 0o600 });
 }
 
 export function loadConfig(overrides: Partial<Config> = {}): Config {

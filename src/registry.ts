@@ -53,6 +53,29 @@ class Registry {
     throw new CLIError(`Unknown command: piapi ${path.join(' ')}`, ExitCode.USAGE);
   }
 
+  // Structured view of a registry path — used by `help` for JSON output so an
+  // intermediate node (e.g. `piapi help auth`) lists its subcommands instead of
+  // throwing the same "Unknown command" error `resolve` reserves for leaf use.
+  describe(path: string[]):
+    | { kind: 'command'; command: CommandSpec; path: string[] }
+    | { kind: 'group'; path: string[]; subcommands: { name: string; description: string }[] }
+    | { kind: 'unknown'; path: string[] } {
+    let node: CommandNode = this.root;
+    const matched: string[] = [];
+    for (const part of path) {
+      const child = node.children.get(part);
+      if (!child) return { kind: 'unknown', path };
+      node = child;
+      matched.push(part);
+    }
+    if (node.command) return { kind: 'command', command: node.command, path: matched };
+    const subcommands = [...node.children.entries()].map(([name, child]) => ({
+      name,
+      description: child.command?.description ?? `[${[...child.children.keys()].join(', ')}]`,
+    }));
+    return { kind: 'group', path: matched, subcommands };
+  }
+
   printHelp(path: string[] = [], out: NodeJS.WriteStream = process.stderr): void {
     if (path.length === 0) { this.printRoot(out); return; }
 

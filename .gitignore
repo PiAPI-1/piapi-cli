@@ -11,3 +11,4 @@ dist/
 EXECUTOR_PROMPT*.md
 .codex
 PLAN.md
+.firecrawl/

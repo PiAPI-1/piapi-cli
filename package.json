@@ -40,7 +40,10 @@
   "homepage": "https://piapi.ai",
   "repository": {
     "type": "git",
-    "url": "https://github.com/legnext-ai/piapi-cli.git"
+    "url": "https://github.com/PiAPI-1/piapi-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PiAPI-1/piapi-cli/issues"
   },
   "license": "MIT",
   "dependencies": {

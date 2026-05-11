@@ -113,15 +113,27 @@ export async function* chatCompletionStream(
   client: OpenAIClient,
   body: ChatRequest,
 ): AsyncGenerator<ChatStreamEvent, void, void> {
-  const res = await fetch(`${client.baseUrl}/v1/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${client.apiKey}`,
-      Accept: 'text/event-stream',
-    },
-    body: JSON.stringify({ ...body, stream: true }),
-  });
+  // Timeout the initial handshake only; once `fetch` resolves the signal no
+  // longer applies to the streaming body read, which is what we want — long
+  // streaming responses should never trip the API timeout mid-flight.
+  let res: Response;
+  try {
+    res = await fetch(`${client.baseUrl}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${client.apiKey}`,
+        Accept: 'text/event-stream',
+      },
+      body: JSON.stringify({ ...body, stream: true }),
+      signal: timeoutSignal(DEFAULT_API_TIMEOUT_MS),
+    });
+  } catch (e) {
+    if (e instanceof Error && e.name === 'TimeoutError') {
+      throw new APIError(`Request timed out after ${resolveTimeout(DEFAULT_API_TIMEOUT_MS)}ms (set PIAPI_TIMEOUT_MS to override)`, 0, 'TIMEOUT');
+    }
+    throw e;
+  }
 
   if (!res.ok || !res.body) {
     const text = await res.text();

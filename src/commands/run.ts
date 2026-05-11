@@ -304,7 +304,7 @@ async function runUnified(
 
   const finalTask = await pollTask(
     async () => getTask({ apiKey, baseUrl }, taskId),
-    (t) => t.status === 'completed' || t.status === 'failed',
+    (t) => t.status === 'completed' || t.status === 'failed' || t.status === 'cancelled',
     {
       quiet: flags.quiet,
       label: `Running ${model.name}…`,
@@ -318,6 +318,9 @@ async function runUnified(
     return;
   }
 
+  if (finalTask.status === 'cancelled') {
+    throw new CLIError(`Task ${taskId} was cancelled.`, ExitCode.API_ERROR);
+  }
   if (finalTask.status !== 'completed') {
     const err = finalTask.error?.message || finalTask.error?.raw_message || 'unknown error';
     throw new CLIError(`Task ${taskId} failed: ${err}`, ExitCode.API_ERROR);
@@ -418,7 +421,5 @@ export default defineCommand({
     } else {
       await runUnified(model, input, apiKey, baseUrl, flags);
     }
-
-    if (flags.dryRun) process.exit(0);
   },
 });

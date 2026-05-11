@@ -4,7 +4,7 @@ export interface TaskResponse {
   data: TaskData;
 }
 
-export type TaskStatus = 'pending' | 'staged' | 'processing' | 'running' | 'completed' | 'failed';
+export type TaskStatus = 'pending' | 'staged' | 'processing' | 'running' | 'completed' | 'failed' | 'cancelled';
 
 export interface TaskError {
   code: number;

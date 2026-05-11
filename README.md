@@ -90,7 +90,6 @@ inline base64 from `gpt-image-2` reference edits) into `--out-dir` (default cwd)
 
 ```bash
 piapi task list
-piapi task list --status running
 piapi task get <id>
 piapi task cancel <id>   # provider-specific (Kling/Midjourney only); v1 returns a hint
 ```
@@ -167,7 +166,7 @@ Precedence: CLI flags → environment variables → config file → defaults.
 For Claude Code, Cursor, and other agents:
 
 ```bash
-npx skills add legnext-ai/piapi-cli
+npx skills add PiAPI-1/piapi-cli
 ```
 
 See [`skill/SKILL.md`](skill/SKILL.md) for the full agent skill specification.
