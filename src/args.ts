@@ -1,14 +1,15 @@
 import type { GlobalFlags, FlagOption } from './types/flags';
 import { CLIError } from './errors/base';
 import { ExitCode } from './errors/codes';
+import { closest } from './suggest';
 
 function kebabToCamel(s: string): string {
   return s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 }
 
-function flagKey(opt: FlagOption): string | null {
+function flagName(opt: FlagOption): string | null {
   const m = opt.flag.match(/^--([a-z][a-z0-9-]*)/i);
-  return m ? kebabToCamel(m[1]!) : null;
+  return m ? m[1]! : null;
 }
 
 function isBoolean(opt: FlagOption): boolean {
@@ -21,14 +22,19 @@ function buildSchema(opts: FlagOption[]) {
   const booleans = new Set<string>();
   const numbers = new Set<string>();
   const arrays = new Set<string>();
+  const known = new Set<string>();   // camelCase keys of every declared flag
+  const names: string[] = [];        // kebab-case names, for "did you mean"
   for (const o of opts) {
-    const k = flagKey(o);
-    if (!k) continue;
+    const name = flagName(o);
+    if (!name) continue;
+    const k = kebabToCamel(name);
+    known.add(k);
+    names.push(name);
     if (isBoolean(o)) booleans.add(k);
     else if (o.type === 'number') numbers.add(k);
     else if (o.type === 'array') arrays.add(k);
   }
-  return { booleans, numbers, arrays };
+  return { booleans, numbers, arrays, known, names };
 }
 
 export function scanCommandPath(argv: string[], globalOptions: FlagOption[] = []): string[] {
@@ -53,7 +59,18 @@ export function scanCommandPath(argv: string[], globalOptions: FlagOption[] = []
   return path;
 }
 
-export function parseFlags(argv: string[], options: FlagOption[]): GlobalFlags {
+export interface ParseFlagsOptions {
+  // strict (default) rejects undeclared flags. The pre-resolution pass in
+  // main.ts parses with strict=false because command-specific flags aren't
+  // known until the command path is resolved.
+  strict?: boolean;
+}
+
+export function parseFlags(
+  argv: string[],
+  options: FlagOption[],
+  { strict = true }: ParseFlagsOptions = {},
+): GlobalFlags {
   const schema = buildSchema(options);
   const flags: GlobalFlags = {};
 
@@ -76,6 +93,21 @@ export function parseFlags(argv: string[], options: FlagOption[]): GlobalFlags {
       }
 
       const ck = kebabToCamel(key);
+
+      if (!schema.known.has(ck)) {
+        if (strict) {
+          const suggestion = closest(key, schema.names);
+          throw new CLIError(
+            `Unknown flag: --${key}`,
+            ExitCode.USAGE,
+            suggestion ? `Did you mean --${suggestion}? Run with --help to list flags.` : `Run with --help to list flags.`,
+          );
+        }
+        // Lenient pass: skip the flag token without consuming a value — we
+        // can't know its arity, and callers only read known global flags.
+        i++;
+        continue;
+      }
 
       if (schema.booleans.has(ck)) {
         (flags as Record<string, unknown>)[ck] = true;
@@ -105,7 +137,17 @@ export function parseFlags(argv: string[], options: FlagOption[]): GlobalFlags {
       continue;
     }
 
-    if (arg.startsWith('-')) { i++; continue; }
+    if (arg.startsWith('-')) {
+      if (strict) {
+        throw new CLIError(
+          `Unknown flag: ${arg}`,
+          ExitCode.USAGE,
+          `Short flags are not supported (except -h/-v). Run with --help to list flags.`,
+        );
+      }
+      i++;
+      continue;
+    }
 
     if (!flags._positional) flags._positional = [];
     flags._positional.push(arg);

@@ -52,8 +52,9 @@ async function main() {
   const argv = process.argv.slice(2);
 
   // Resolve global flags before any rendering so --no-color and --output
-  // affect even the early help/version path.
-  const preFlags = parseFlags(argv, GLOBAL_OPTIONS);
+  // affect even the early help/version path. Lenient: command-specific flags
+  // aren't known yet — the post-resolution parse below is the strict one.
+  const preFlags = parseFlags(argv, GLOBAL_OPTIONS, { strict: false });
   setOutputMode(preFlags.output ?? 'text');
   setNoColor(preFlags.noColor === true);
 
