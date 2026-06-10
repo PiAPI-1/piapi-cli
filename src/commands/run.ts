@@ -268,14 +268,21 @@ async function runUnified(
     () => createTask({ apiKey, baseUrl }, req),
   );
   const taskId = created.task_id;
+  // Surface the task id before the (possibly minutes-long) wait so a Ctrl-C,
+  // network drop, or timeout never strands the user without a way to resume.
+  if (!flags.quiet) {
+    process.stderr.write(`Task ${taskId} created — resume anytime with: piapi task wait ${taskId}\n`);
+  }
 
   const finalTask = await pollTask(
     async () => getTask({ apiKey, baseUrl }, taskId),
     (t) => isTerminalStatus(t.status),
     {
       quiet: flags.quiet,
+      timeout: typeof flags.timeout === 'number' && flags.timeout > 0 ? flags.timeout * 1000 : undefined,
       label: `Running ${model.name}…`,
       getStatus: (t) => t.status,
+      resumeCommand: `piapi task wait ${taskId}`,
     },
   );
 

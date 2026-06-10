@@ -15,6 +15,7 @@ export const GLOBAL_OPTIONS: FlagOption[] = [
   { flag: '--no-color', description: 'Disable ANSI colors and spinner' },
   { flag: '--non-interactive', description: 'Fail when input is needed' },
   { flag: '--async', description: 'Return task ID without polling' },
+  { flag: '--timeout <seconds>', description: 'Max wait while polling a task (default 300)', type: 'number' },
   { flag: '--stream', description: 'Stream LLM output as it arrives (LLM/openai-completions only)' },
   { flag: '--dry-run', description: 'Show request without executing' },
   { flag: '--webhook <url>', description: 'Webhook URL for callbacks', type: 'string' },
