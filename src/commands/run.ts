@@ -304,6 +304,8 @@ export default defineCommand({
     'piapi run claude-sonnet-4.6 prompt="rewrite this" --stream',
     'piapi run sora2-pro prompt="a sunset" --async',
     'piapi run flux-dev prompt="test" --dry-run',
+    'piapi run kling-3 prompt="…" version==3.0          # == forces a literal string',
+    'piapi run mj-blend image_urls:=\'["https://a.png","https://b.png"]\'  # := strict JSON',
   ],
   async execute(config, flags: GlobalFlags) {
     const modelName = flags._positional?.[0];
