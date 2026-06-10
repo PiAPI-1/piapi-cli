@@ -1,6 +1,6 @@
 import { defineCommand } from '../command';
 import { resolveAPIKey } from '../auth/resolver';
-import { getModel } from '../models/catalog';
+import { getModel, unknownModelError } from '../models/catalog';
 import type { ModelEntry } from '../models/catalog';
 import { parseInput } from '../models/input-parser';
 import { createTask, getTask } from '../client/unified';
@@ -312,10 +312,10 @@ export default defineCommand({
     if (!modelName) throw new CLIError('Usage: piapi run <model> key=value...', ExitCode.USAGE);
 
     const model = getModel(modelName);
-    if (!model) throw new CLIError(
-      `Unknown model: ${modelName}. Run "piapi model list" for available models.`,
-      ExitCode.USAGE,
-    );
+    if (!model) {
+      const { message, hint } = unknownModelError(modelName);
+      throw new CLIError(message, ExitCode.USAGE, hint);
+    }
 
     const kvArgs = (flags._positional ?? []).slice(1);
     const userInput = parseInput(kvArgs);
@@ -364,6 +364,9 @@ export default defineCommand({
     }
 
     const apiType = model.apiType ?? 'unified';
+    if (flags.stream && apiType !== 'openai-completions' && !flags.quiet) {
+      process.stderr.write(`Note: --stream only applies to LLM (chat) models; ignored for ${model.name}.\n`);
+    }
     if (apiType === 'openai-images') {
       await runOpenAIImage(model, input, apiKey, baseUrl, flags);
     } else if (apiType === 'openai-completions') {

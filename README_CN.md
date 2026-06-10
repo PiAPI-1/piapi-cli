@@ -57,8 +57,9 @@ piapi run gpt-image-2 prompt="一只柯基在太空" size=1024x1024
 piapi run gpt-4o prompt="解释 JavaScript 的 async/await" --stream
 piapi run claude-sonnet-4.6 prompt="把这封邮件改得更简洁" system="你是写作教练"
 
-# 生成视频（异步）
+# 生成视频（异步），再等待结果
 piapi run sora2-pro prompt="海浪" --async
+piapi task wait <task-id> --download
 
 # 上传本地文件 → 运行 → 自动下载结果
 piapi run remove-bg image=@./photo.png --download --out-dir ./out
@@ -85,6 +86,14 @@ piapi run gpt-4o prompt="你好" --stream
 piapi run flux-dev prompt="测试" --dry-run
 ```
 
+**输入操作符**（httpie 风格）：
+
+| 语法 | 含义 |
+|---|---|
+| `key=value` | 自动推断类型：`n=2` → 数字，`hd=true` → 布尔，其余为字符串 |
+| `key==value` | 强制字面字符串，不做类型推断（`version==3.0` → `"3.0"`） |
+| `key:=json` | 严格 JSON：`urls:='["https://a.png","https://b.png"]'`、`cfg:='{"a":1}'` |
+
 **本地文件** — 输入值前加 `@` 即在请求前自动上传：
 
 ```bash
@@ -100,6 +109,7 @@ piapi run faceswap source=@./face.jpg target=@./scene.png --async
 ```bash
 piapi task list
 piapi task get <id>
+piapi task wait <id> --download   # 轮询直到完成，输出与同步 run 一致
 piapi task cancel <id>   # 仅部分提供方支持（Kling/Midjourney）；v1 会返回提示
 ```
 
@@ -144,6 +154,7 @@ piapi quota
 | `--quiet` | 抑制进度指示器 |
 | `--non-interactive` | 缺少输入时直接失败 |
 | `--async` | 立即返回任务 ID |
+| `--timeout <seconds>` | 轮询任务的最长等待时间（默认 300 秒） |
 | `--stream` | 流式输出 LLM token（仅 openai-completions 模型） |
 | `--dry-run` | 预览请求不执行 |
 | `--webhook <url>` | 回调 Webhook URL |

@@ -1,6 +1,6 @@
 import { defineCommand } from '../../command';
 import { getModelSchema } from '../../models/schema';
-import { getModel } from '../../models/catalog';
+import { getModel, unknownModelError } from '../../models/catalog';
 import type { GlobalFlags } from '../../types/flags';
 import { formatJSON } from '../../output/json';
 import { CLIError } from '../../errors/base';
@@ -15,10 +15,8 @@ export default defineCommand({
     if (!modelName) throw new CLIError('Usage: piapi model schema <model>', ExitCode.USAGE);
 
     if (!getModel(modelName)) {
-      throw new CLIError(
-        `Unknown model: ${modelName}. Run "piapi model list" for available models.`,
-        ExitCode.USAGE,
-      );
+      const { message, hint } = unknownModelError(modelName);
+      throw new CLIError(message, ExitCode.USAGE, hint);
     }
 
     const schema = getModelSchema(modelName);

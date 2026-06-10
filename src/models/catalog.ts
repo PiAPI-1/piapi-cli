@@ -11,6 +11,8 @@
 //   https://piapi.ai/docs/kling-api/kling-3-api.md
 //   etc — each entry carries its docs URL inline.
 
+import { closest } from '../suggest';
+
 export type ModelType = 'image' | 'video' | 'audio' | '3d' | 'llm';
 
 // PiAPI exposes two API surfaces:
@@ -255,6 +257,18 @@ export const MODELS: ModelEntry[] = [
 
 export function getModel(name: string): ModelEntry | undefined {
   return MODELS.find(m => m.name === name);
+}
+
+// "Unknown model: flux-dv" with 94 entries is almost always a typo —
+// build the standard error with a closest-name suggestion attached.
+export function unknownModelError(name: string): { message: string; hint: string } {
+  const suggestion = closest(name, MODELS.map(m => m.name));
+  return {
+    message: `Unknown model: ${name}`,
+    hint: suggestion
+      ? `Did you mean "${suggestion}"? Run "piapi model list" for available models.`
+      : `Run "piapi model list" for available models.`,
+  };
 }
 
 export function getModelsByType(type: ModelType): ModelEntry[] {

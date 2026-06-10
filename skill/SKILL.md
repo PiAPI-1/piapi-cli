@@ -28,6 +28,7 @@ piapi auth status
 | `--quiet` | Suppress spinners/progress; stdout is pure data |
 | `--output json` | Machine-readable JSON output |
 | `--async` | Return task ID immediately without polling |
+| `--timeout <seconds>` | Max wait while polling a task (default 300) |
 | `--stream` | Stream LLM output as it arrives (openai-completions only) |
 | `--dry-run` | Preview the API request without executing |
 | `--api-key <key>` | Override API key per-call |
@@ -62,6 +63,14 @@ piapi run remove-bg image=@./photo.png --download --out-dir ./out
 piapi run faceswap target_image=@./me.jpg swap_image=@./friend.jpg --download
 ```
 
+**Input operators** (httpie-style):
+
+- `key=value` — auto-coerced: `n=2` → number, `hd=true` → boolean, rest string
+- `key==value` — literal string, never coerced (`version==3.0` → `"3.0"`)
+- `key:=json` — strict JSON: `urls:='["https://a.png","https://b.png"]'`, `cfg:='{"a":1}'`
+
+Bare arguments without `=` are rejected (catches unquoted prompts).
+
 **Local files**: any `key=@./path/to/file` is auto-uploaded to PiAPI's
 ephemeral resource endpoint and rewritten to a temporary URL before the
 request goes out. Bare URLs (`key=https://…`) are passed through. The
@@ -69,9 +78,10 @@ upload requires a paid PiAPI plan; on free plans you get a clear hint
 to use a public URL instead.
 
 **Auto-download**: with `--download`, every URL the result yields is
-written to disk under `--out-dir` (default cwd). Filenames come from
-the URL path; existing files are overwritten. Stderr logs `Saved → …`
-per file; stdout still shows the URL lines for grepping.
+written to disk under `--out-dir` (default cwd) — in both text and JSON
+output modes. Filenames come from the URL path; collisions get a `-1`,
+`-2`… suffix instead of overwriting. Stderr logs `Saved → …` per file;
+stdout still shows the URL lines for grepping.
 
 | Flag | Description |
 |---|---|
@@ -121,6 +131,18 @@ piapi task list
 
 ```bash
 piapi task get <task-id>
+```
+
+### piapi task wait \<id\>
+
+Poll a task until it reaches a terminal status, then render exactly like
+a synchronous `piapi run`: URL lines (or full JSON in JSON mode), non-zero
+exit on failure, `--download`/`--out-dir`/`--timeout` supported. This is
+the standard follow-up after `--async`:
+
+```bash
+piapi run sora2-pro prompt="waves" --async --output json   # → {"task_id": "..."}
+piapi task wait <task-id> --download --timeout 1200
 ```
 
 ### piapi task cancel \<id\>

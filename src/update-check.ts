@@ -67,6 +67,9 @@ export function isNewer(a: string, b: string): boolean {
 function startBackgroundRefresh(): void {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  // Don't let the abort timer itself keep the process alive — only the
+  // in-flight fetch may delay exit, and only up to the cap.
+  timer.unref?.();
   fetch(REGISTRY_URL, { signal: controller.signal, headers: { Accept: 'application/json' } })
     .then((r) => (r.ok ? r.json() : null))
     .then((data) => {

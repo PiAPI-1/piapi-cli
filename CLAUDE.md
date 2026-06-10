@@ -8,7 +8,7 @@ bun run dev       # source 模式（VERSION = 0.0.0-dev）
 bun run build     # → dist/piapi.mjs，注入 CLI_VERSION
 bun run lint      # eslint src/ test/
 bun run typecheck # tsc --noEmit
-bun test          # 15 tests / 0 fail，CI gate
+bun test          # 0 fail，CI gate（数量会涨，别在这硬编码）
 ```
 
 ## 不动的硬约束
@@ -27,6 +27,9 @@ bun test          # 15 tests / 0 fail，CI gate
 - **Dispatch 在 `src/commands/run.ts`**：`runUnified` / `runOpenAIChat` / `runOpenAIImage`，按 `apiType` + `streamingOnly` 分流。`--stream` 也走 chat stream 分支。
 - **Trie 命令注册**（`src/registry.ts`），子命令自动 fall-through。新增命令在 `src/main.ts` 用 `registry.register('group sub', cmd)`。
 - **Catalog 是数据，不是 switch case**。每条目通过 `asyncOnly` / `streamingOnly` / `apiType` 标记声明行为。新增模型只动 `MODELS[]`，不动 dispatch。
+- **输入操作符（httpie 风格）**：`key=value` 启发式转型 / `key==value` 强制字符串 / `key:=json` 严格 JSON。裸参数（无 `=`）直接报错。`src/models/input-parser.ts`
+- **Flag 解析是严格的**：未知 flag 报错 + did-you-mean（`src/suggest.ts`）。main.ts 的 preflight pass 用 `{strict: false}`，因为 command-specific flags 在 resolve 前未知——别把它改成 strict。
+- **终态任务渲染统一走 `src/output/task-result.ts`**（`run` 同步路径和 `task wait` 共用）：JSON 模式先打 task body 再对 failed/cancelled 抛错（exit 3），`--download` 两种输出模式都生效。
 
 ## 输出规则（TTY-aware）
 

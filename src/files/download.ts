@@ -1,10 +1,25 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { basename, join } from 'node:path';
+import { existsSync } from 'node:fs';
+import { basename, extname, join } from 'node:path';
 import { DEFAULT_TRANSFER_TIMEOUT_MS, resolveTimeout, timeoutSignal } from '../client/timeout';
 
 export interface DownloadOptions {
   outDir?: string;
   quiet?: boolean;
+}
+
+// Never overwrite: batch results frequently share a basename (image.png from
+// different URL paths), and clobbering a previous render loses paid output.
+// On collision, append -1, -2, … before the extension.
+function uniquePath(dir: string, name: string): string {
+  let p = join(dir, name);
+  if (!existsSync(p)) return p;
+  const ext = extname(name);
+  const stem = name.slice(0, name.length - ext.length);
+  for (let i = 1; ; i++) {
+    p = join(dir, `${stem}-${i}${ext}`);
+    if (!existsSync(p)) return p;
+  }
 }
 
 // Decode an OpenAI-style `b64_json` payload to disk under the same outDir
@@ -18,7 +33,7 @@ export async function saveBase64(
   const dir = opts.outDir ?? process.cwd();
   await mkdir(dir, { recursive: true });
   const name = filename || `image-${Date.now()}.png`;
-  const finalPath = join(dir, name);
+  const finalPath = uniquePath(dir, name);
   await writeFile(finalPath, Buffer.from(b64, 'base64'));
   if (!opts.quiet) process.stderr.write(`Saved → ${finalPath}\n`);
   return finalPath;
@@ -36,8 +51,7 @@ function filenameFromUrl(url: string): string {
 }
 
 // Download `url` and write it to outDir (default cwd). Returns the full
-// path written. Creates the directory if missing. On collision we keep
-// it simple and overwrite — the caller can pre-flight if they care.
+// path written. Creates the directory if missing.
 export async function downloadUrl(url: string, opts: DownloadOptions = {}): Promise<string> {
   let res: Response;
   try {
@@ -52,8 +66,7 @@ export async function downloadUrl(url: string, opts: DownloadOptions = {}): Prom
 
   const dir = opts.outDir ?? process.cwd();
   await mkdir(dir, { recursive: true });
-  const filename = filenameFromUrl(url);
-  const finalPath = join(dir, filename);
+  const finalPath = uniquePath(dir, filenameFromUrl(url));
 
   await writeFile(finalPath, Buffer.from(await res.arrayBuffer()));
   if (!opts.quiet) process.stderr.write(`Saved → ${finalPath}\n`);

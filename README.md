@@ -57,8 +57,9 @@ piapi run gpt-image-2 prompt="a corgi in space" size=1024x1024
 piapi run gpt-4o prompt="explain async/await in JavaScript" --stream
 piapi run claude-sonnet-4.6 prompt="rewrite this email more concisely" system="you are a writing coach"
 
-# Generate a video (async)
+# Generate a video (async), then wait for the result
 piapi run sora2-pro prompt="ocean waves" --async
+piapi task wait <task-id> --download
 
 # Upload a local file → run → auto-download the result
 piapi run remove-bg image=@./photo.png --download --out-dir ./out
@@ -85,6 +86,14 @@ piapi run gpt-4o prompt="hello, world" --stream
 piapi run flux-dev prompt="test" --dry-run
 ```
 
+**Input operators** (httpie-style):
+
+| Syntax | Meaning |
+|---|---|
+| `key=value` | Auto-coerced: `n=2` → number, `hd=true` → boolean, everything else string |
+| `key==value` | Literal string, never coerced (`version==3.0` → `"3.0"`) |
+| `key:=json` | Strict JSON: `urls:='["https://a.png","https://b.png"]'`, `cfg:='{"a":1}'` |
+
 **Local files** — prefix any input with `@` to upload before the request runs:
 
 ```bash
@@ -100,6 +109,7 @@ inline base64 from `gpt-image-2` reference edits) into `--out-dir` (default cwd)
 ```bash
 piapi task list
 piapi task get <id>
+piapi task wait <id> --download   # poll until finished, render like a sync run
 piapi task cancel <id>   # provider-specific (Kling/Midjourney only); v1 returns a hint
 ```
 
@@ -145,6 +155,7 @@ piapi quota
 | `--quiet` | Suppress progress indicators |
 | `--non-interactive` | Fail on missing input |
 | `--async` | Return task ID immediately |
+| `--timeout <seconds>` | Max wait while polling a task (default 300) |
 | `--stream` | Stream LLM output as it arrives (openai-completions only) |
 | `--dry-run` | Preview request without executing |
 | `--webhook <url>` | Webhook URL for callbacks |
