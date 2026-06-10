@@ -142,7 +142,7 @@ ${b('Resources:')}
   ${a('config')}     ${d('CLI configuration (show, set)')}
   ${a('quota')}      ${d('Account quota and credits')}
   ${a('run')}        ${d('Run a model task')}
-  ${a('task')}       ${d('Task management (list, get, cancel)')}
+  ${a('task')}       ${d('Task management (list, get, wait, cancel)')}
   ${a('model')}      ${d('Model discovery (list, schema)')}
 
 ${b('Global Flags:')}
