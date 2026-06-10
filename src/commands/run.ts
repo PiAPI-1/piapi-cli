@@ -16,48 +16,16 @@ import {
 import { pollTask } from '../polling/poll';
 import { uploadFile } from '../files/upload';
 import { resolveLocalFiles } from '../files/resolve';
-import { downloadUrl, saveBase64 } from '../files/download';
+import { saveBase64 } from '../files/download';
 import type { GlobalFlags } from '../types/flags';
 import { isTerminalStatus, type CreateTaskRequest } from '../types/api';
 import { getFormatter } from '../output/formatter';
 import { formatJSON } from '../output/json';
 import { withSpinner } from '../output/progress';
 import { printRunSuccess, printRunPending } from '../output/run-status';
+import { extractUrls, maybeDownload, renderUnifiedResult } from '../output/task-result';
 import { CLIError } from '../errors/base';
 import { ExitCode } from '../errors/codes';
-
-// Walk the (possibly URL-bearing) results and download each one when the
-// user passed --download. Best-effort: a single download failure logs to
-// stderr but does not abort the rest of the batch — partial saves are
-// still useful, and the URLs themselves remain visible in stdout.
-async function maybeDownload(urls: string[], flags: GlobalFlags): Promise<void> {
-  if (!flags.download || urls.length === 0) return;
-  const dedup = [...new Set(urls)];
-  for (const url of dedup) {
-    try {
-      await downloadUrl(url, { outDir: flags.outDir, quiet: flags.quiet });
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      process.stderr.write(`Download failed: ${url} (${msg})\n`);
-    }
-  }
-}
-
-function extractUrls(value: unknown, path = ''): { label: string; url: string }[] {
-  if (value == null) return [];
-  if (typeof value === 'string') {
-    return /^https?:\/\//.test(value) ? [{ label: path || 'url', url: value }] : [];
-  }
-  if (Array.isArray(value)) {
-    return value.flatMap((v, i) => extractUrls(v, `${path}[${i}]`));
-  }
-  if (typeof value === 'object') {
-    return Object.entries(value as Record<string, unknown>).flatMap(([k, v]) =>
-      extractUrls(v, path ? `${path}.${k}` : k),
-    );
-  }
-  return [];
-}
 
 // Map CLI key=value args into OpenAI chat/completions body.
 // Convention:
@@ -111,29 +79,30 @@ async function runOpenAIImage(
     () => imageGeneration({ apiKey, baseUrl }, body),
   );
   const formatter = getFormatter(flags);
-  if (formatter === 'json') {
-    process.stdout.write(formatJSON(res) + '\n');
-    return;
-  }
   const urls = extractUrls(res.data);
   // gpt-image-2 with reference image input returns base64 inline (b64_json)
   // instead of a URL — capture both modes so --download works either way.
   const b64Items = (res.data ?? [])
     .map((d, i) => ({ index: i, b64: d.b64_json }))
     .filter((x): x is { index: number; b64: string } => typeof x.b64 === 'string' && x.b64.length > 0);
-  printRunSuccess({
-    title: model.name,
-    elapsedMs: Date.now() - t0,
-    extra: res.usage?.total_tokens ? `${res.usage.total_tokens} tokens` : undefined,
-  });
-  if (urls.length > 0) {
-    for (const { label, url } of urls) process.stdout.write(`data${label}: ${url}\n`);
-  } else if (b64Items.length > 0) {
-    for (const { index, b64 } of b64Items) {
-      process.stdout.write(`data[${index}].b64_json: <${Math.round(b64.length * 3 / 4 / 1024)} KB>\n`);
-    }
-  } else {
+
+  if (formatter === 'json') {
     process.stdout.write(formatJSON(res) + '\n');
+  } else {
+    printRunSuccess({
+      title: model.name,
+      elapsedMs: Date.now() - t0,
+      extra: res.usage?.total_tokens ? `${res.usage.total_tokens} tokens` : undefined,
+    });
+    if (urls.length > 0) {
+      for (const { label, url } of urls) process.stdout.write(`data${label}: ${url}\n`);
+    } else if (b64Items.length > 0) {
+      for (const { index, b64 } of b64Items) {
+        process.stdout.write(`data[${index}].b64_json: <${Math.round(b64.length * 3 / 4 / 1024)} KB>\n`);
+      }
+    } else {
+      process.stdout.write(formatJSON(res) + '\n');
+    }
   }
   await maybeDownload(urls.map((u) => u.url), flags);
   if (flags.download && b64Items.length > 0) {
@@ -224,13 +193,6 @@ async function runOpenAIChatStream(
   // Treat usage as present only if at least total_tokens looks like a number.
   const hasUsage = typeof usage?.total_tokens === 'number';
 
-  if (formatter === 'json') {
-    process.stdout.write(formatJSON({ content: accumulated, usage: hasUsage ? usage : undefined }) + '\n');
-    return;
-  }
-
-  if (accumulated.length > 0 && !accumulated.endsWith('\n')) process.stdout.write('\n');
-
   // Pull every http(s) URL out of the markdown blob, dedupe in order.
   const seen = new Set<string>();
   const urls: string[] = [];
@@ -238,15 +200,20 @@ async function runOpenAIChatStream(
     const url = m[0]!.replace(/[.,;:!?]+$/, '');
     if (!seen.has(url)) { seen.add(url); urls.push(url); }
   }
-  if (urls.length > 0) {
-    process.stdout.write('\n');
-    for (const url of urls) process.stdout.write(`url: ${url}\n`);
-  }
 
-  if (hasUsage && usage) {
-    process.stderr.write(
-      `Usage: ${usage.total_tokens} tokens (in ${usage.prompt_tokens}, out ${usage.completion_tokens})\n`,
-    );
+  if (formatter === 'json') {
+    process.stdout.write(formatJSON({ content: accumulated, urls, usage: hasUsage ? usage : undefined }) + '\n');
+  } else {
+    if (accumulated.length > 0 && !accumulated.endsWith('\n')) process.stdout.write('\n');
+    if (urls.length > 0) {
+      process.stdout.write('\n');
+      for (const url of urls) process.stdout.write(`url: ${url}\n`);
+    }
+    if (hasUsage && usage) {
+      process.stderr.write(
+        `Usage: ${usage.total_tokens} tokens (in ${usage.prompt_tokens}, out ${usage.completion_tokens})\n`,
+      );
+    }
   }
   await maybeDownload(urls, flags);
 }
@@ -312,37 +279,11 @@ async function runUnified(
     },
   );
 
-  const formatter = getFormatter(flags);
-  if (formatter === 'json') {
-    process.stdout.write(formatJSON(finalTask) + '\n');
-    return;
-  }
-
-  if (finalTask.status === 'cancelled') {
-    throw new CLIError(`Task ${taskId} was cancelled.`, ExitCode.API_ERROR);
-  }
-  if (finalTask.status !== 'completed') {
-    const err = finalTask.error?.message || finalTask.error?.raw_message || 'unknown error';
-    throw new CLIError(`Task ${taskId} failed: ${err}`, ExitCode.API_ERROR);
-  }
-
-  const out = finalTask.output;
-  // Output schema varies per model (image_url, video, model_file, works[].audio…).
-  // Walk the tree and print every http(s) URL with its key path; fall back to
-  // raw JSON if no URLs found so the user still sees the result.
-  const urls = extractUrls(out);
-  const usage = finalTask.meta?.usage;
-  printRunSuccess({
+  await renderUnifiedResult(finalTask, {
     title: model.name,
     elapsedMs: Date.now() - t0,
-    extra: usage ? `${usage.consume} ${usage.type}s` : undefined,
+    flags,
   });
-  if (urls.length > 0) {
-    for (const { label, url } of urls) process.stdout.write(`${label}: ${url}\n`);
-  } else if (out) {
-    process.stdout.write(formatJSON(out) + '\n');
-  }
-  await maybeDownload(urls.map((u) => u.url), flags);
 }
 
 export default defineCommand({
