@@ -95,6 +95,10 @@ export const MODELS: ModelEntry[] = [
 
   // docs: https://piapi.ai/docs/seedream-api/seedream-5-lite.md
   { name: 'seedream-5-lite', type: 'image', model: 'seedream', taskType: 'seedream-5-lite', provider: 'Seedream', verified: true },
+  // Less-restriction variant: same engine and input schema, more permissive
+  // content review, +25% price, no retry on content rejection.
+  // docs: https://piapi.ai/docs/seedance-api/less-restriction.md
+  { name: 'seedream-5-lite-less-restriction', type: 'image', model: 'seedream', taskType: 'seedream-5-lite-less-restriction', provider: 'Seedream', verified: true },
 
   // ========== image tools ==========
   // docs: https://piapi.ai/docs/image-editing-api/remove-background-api.md
@@ -187,10 +191,18 @@ export const MODELS: ModelEntry[] = [
   // docs: https://piapi.ai/docs/wanx-api/create-task.md
   { name: 'wanx22-img2vid', type: 'video', model: 'Qubico/wanx', taskType: 'wan22-img2video-14b', provider: 'Wan', asyncOnly: true, verified: true },
 
+  // `mode` is optional and auto-inferred from the references passed (text /
+  // first_last_frames / omni_reference) — do NOT default it, or image/video
+  // reference workflows break against the strict mode validation.
   // docs: https://piapi.ai/docs/seedance-api/seedance-2.md
-  { name: 'seedance-2', type: 'video', model: 'seedance', taskType: 'seedance-2', provider: 'Seedance', asyncOnly: true, defaultInput: { mode: 'text_to_video' }, verified: true },
-  // docs: https://piapi.ai/docs/seedance-api/seedance-2-preview.md
-  { name: 'seedance-2-preview', type: 'video', model: 'seedance', taskType: 'seedance-2-preview', provider: 'Seedance', asyncOnly: true, verified: true },
+  { name: 'seedance-2', type: 'video', model: 'seedance', taskType: 'seedance-2', provider: 'Seedance', asyncOnly: true, verified: true },
+  { name: 'seedance-2-fast', type: 'video', model: 'seedance', taskType: 'seedance-2-fast', provider: 'Seedance', asyncOnly: true, verified: true },
+  // Less-restriction variants: same engine and input schema, more permissive
+  // content review, +25% price, no retry on content rejection. Fast tiers cap
+  // at 720p.
+  // docs: https://piapi.ai/docs/seedance-api/less-restriction.md
+  { name: 'seedance-2-less-restriction', type: 'video', model: 'seedance', taskType: 'seedance-2-less-restriction', provider: 'Seedance', asyncOnly: true, verified: true },
+  { name: 'seedance-2-fast-less-restriction', type: 'video', model: 'seedance', taskType: 'seedance-2-fast-less-restriction', provider: 'Seedance', asyncOnly: true, verified: true },
   // docs: https://piapi.ai/docs/seedance-api/video-watermark-remover.md
   { name: 'seedance-watermark', type: 'video', model: 'seedance', taskType: 'remove-watermark', provider: 'Seedance', asyncOnly: true, verified: true },
 

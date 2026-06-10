@@ -1,7 +1,7 @@
 {
   "name": "piapi-cli",
   "version": "0.1.1",
-  "description": "Official CLI for the PiAPI platform — call 94 multimodal AI models (image, video, audio, 3D, LLM) from your terminal or AI agent",
+  "description": "Official CLI for the PiAPI platform — call 97 multimodal AI models (image, video, audio, 3D, LLM) from your terminal or AI agent",
   "type": "module",
   "engines": {
     "node": ">=18"

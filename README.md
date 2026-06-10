@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>piapi — one binary for 94 multimodal AI models</strong><br>
+  <strong>piapi — one binary for 97 multimodal AI models</strong><br>
   Generate images, videos, audio, 3D, and chat with LLMs from your terminal or AI agent.
 </p>
 
@@ -13,8 +13,8 @@
 
 ## Features
 
-- **Image** — 34 models incl. `flux-dev`, `nano-banana-pro`, `qwen-image-edit`, `seedream-5-lite`, `midjourney`, plus tools (`remove-bg`, `upscale`, `segment`, `joycaption`, `faceswap`)
-- **Video** — 40 models incl. `sora2-pro`, `kling-3`, `veo3-fast`, `wanx22`, `seedance-2`, `hailuo`, `luma`
+- **Image** — 35 models incl. `flux-dev`, `nano-banana-pro`, `qwen-image-edit`, `seedream-5-lite`, `midjourney`, plus tools (`remove-bg`, `upscale`, `segment`, `joycaption`, `faceswap`)
+- **Video** — 42 models incl. `sora2-pro`, `kling-3`, `veo3-fast`, `wanx22`, `seedance-2`, `hailuo`, `luma`
 - **Audio** — 10 models incl. `mmaudio` (video→audio), `f5-tts`, `diffrhythm`, `udio-music`, `ace-step`
 - **3D** — `trellis` (text→3D), `trellis2` (image→3D)
 - **LLM** — 8 chat models incl. `gpt-4o`, `claude-sonnet-4.6`, `gpt-5`, plus `gpt-image-2` for OpenAI-compatible image generation

@@ -1,6 +1,6 @@
 # piapi-cli — Repo Guide
 
-PiAPI 官方 CLI。94 个多模态模型聚合（image/video/audio/3D/LLM）。Bootstrap SaaS 项目，发布到 npm `piapi-cli`。
+PiAPI 官方 CLI。97 个多模态模型聚合（image/video/audio/3D/LLM）。Bootstrap SaaS 项目，发布到 npm `piapi-cli`。
 
 ## 命令
 ```bash
@@ -14,7 +14,7 @@ bun test          # 0 fail，CI gate（数量会涨，别在这硬编码）
 ## 不动的硬约束
 
 - **Brand 颜色只允许 pure blue**。禁紫/粉/青/teal — 这些是通用 AI 工具默认色，要避开。看到这些立刻替换成 `ANSI.blue` 或 `bold + dim`。
-- **94 个 catalog 条目都已对照 PiAPI 文档校验**。每条带 `// docs:` 链接 + `verified: true`。新增模型必须先验证文档才能加。
+- **97 个 catalog 条目都已对照 PiAPI 文档校验**。每条带 `// docs:` 链接 + `verified: true`。新增模型必须先验证文档才能加。
 - **Skip PiAPI 文档标"deprecated"或"service stopped"的接口**（如 Suno）。
 - **对话中文，代码/commit/PR/注释英文**。
 
@@ -62,6 +62,6 @@ bun test          # 0 fail，CI gate（数量会涨，别在这硬编码）
 
 - **VERSION 不要硬编码**，必须 `process.env.CLI_VERSION ?? '0.0.0-dev'`，由 `build.ts` define 注入
 - **`registry.printRoot` 不要硬编码 flag 列表**，从 `GLOBAL_OPTIONS` 迭代渲染
-- **`models/schema.ts` 只覆盖 7/94 条目**，`model schema <X>` 错误消息要区分"unknown model"和"no schema defined"
+- **`models/schema.ts` 只覆盖 7/97 条目**，`model schema <X>` 错误消息要区分"unknown model"和"no schema defined"
 - **流式 chat 的 `usage` 可能是 `{}`**，必须 `typeof usage?.total_tokens === 'number'` 才打印
 - **`status-bar.ts` 模块级 `printed` 是设计意图**（一次启动只打一次 banner），别"修复"

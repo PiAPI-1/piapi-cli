@@ -4,56 +4,56 @@
 - Get Started [PiAPI Documentation - the technical doc for APIs provided by PiAPI!PiAPI Documentation - the technical doc for APIs provided by PiAPI!](https://piapi.ai/docs/overview.md): An introduction to PiAPI's documentation, the key features (including Unified API, and Webhooks), and the list of available APIs include Midjourney, Flux, Kling, Dream Machine, Suno, LLM, etc.
 - Get Started [Quick Start - PiAPI docs](https://piapi.ai/docs/quickstart.md): Getting started quickly with PiAPI, generate your API Key, set base url, and make your first API call!
 - Get Started [PiAPI/Make Instruction of Flux API](https://piapi.ai/docs/piapi-make/make-insturcution.md): Recently, to help more content creators easily use PiAPI for their projects, Flux by PiAPI has officially launched on the Make platform!
-- [Endpoints](https://piapi.ai/docs/endpoints.md):
+- [Endpoints](https://piapi.ai/docs/endpoints.md):  
 - Endpoints > Flux [Flux with LoRA and ControlNet - PiAPI docs](https://piapi.ai/docs/flux-with-lora-and-controlnet.md): How to use LoRA and ControlNet models with Flux? Check out this PiAPI docs for more!
-- Endpoints > Flux [Available LoRA and ControlNet - PiAPI docs ](https://piapi.ai/docs/available-lora-and-controlnet.md): This page has a list of all available LoRA and ControlNet models compatible with the Flux API.
-- Endpoints > Flux [Flux API with Redux and Fill](https://piapi.ai/docs/flux-redux-fill-variation-inpaint-outpaint.md):
-- Endpoints > Kling [Lipsync With PiAPI Kling API](https://piapi.ai/docs/kling-api/lipsync-examples.md):
-- Endpoints > Kling [Motion Brush With PiAPI Kling API Example](https://piapi.ai/docs/kling-api/motion-brush-examples.md):
-- Endpoints > Kling [Kling Elements Video Generation API](https://piapi.ai/docs/kling-api/kling-elements.md):
-- Endpoints > Kling [Kling Effects Video Generation](https://piapi.ai/docs/kling-api/kling-effects.md):
-- Endpoints > Seedance [Moderation and Penalty](https://piapi.ai/docs/seedance-api/moderation-and-penalty.md):
-- Endpoints > Seedance [Model Comparison](https://piapi.ai/docs/seedance-api/model-comparison.md):
+- Endpoints > Flux [Available LoRA and ControlNet - PiAPI docs ](https://piapi.ai/docs/available-lora-and-controlnet.md): This page has a list of all available LoRA and ControlNet models compatible with the Flux API. 
+- Endpoints > Flux [Flux API with Redux and Fill](https://piapi.ai/docs/flux-redux-fill-variation-inpaint-outpaint.md): 
+- Endpoints > Kling [Lipsync With PiAPI Kling API](https://piapi.ai/docs/kling-api/lipsync-examples.md): 
+- Endpoints > Kling [Motion Brush With PiAPI Kling API Example](https://piapi.ai/docs/kling-api/motion-brush-examples.md): 
+- Endpoints > Kling [Kling Elements Video Generation API](https://piapi.ai/docs/kling-api/kling-elements.md): 
+- Endpoints > Kling [Kling Effects Video Generation](https://piapi.ai/docs/kling-api/kling-effects.md): 
+- Endpoints > Seedance [Less-Restriction Models Guide](https://piapi.ai/docs/seedance-api/less-restriction.md): 
+- Endpoints > Seedance [Private Asset Library](https://piapi.ai/docs/seedance-api/private-asset.md): 
 - Endpoints > WanX [PiAPI/WanX&LoRA Tutorial](https://piapi.ai/docs/wanx_lora/tutorial.md): To help users optimize WanX task creation, we've provided practical examples demonstrating how to construct proper API calls for better information reference.
 - Endpoints > WanX [PiAPI/Available LoRA Types for Wanx](https://piapi.ai/docs/wanx-lora-type.md): We have updated various LoRA models for Wanx available for PiAPI users.
 - Endpoints > WanX [PiAPI/Use Cases for Wanx LoRA](https://piapi.ai/docs/wanx-lora/use-case.md): In this article, we will introduce PiAPI's LoRA use cases for Wanx, providing API call references.
-- Endpoints > WanX [Use Cases for Wanx Control Camera](https://piapi.ai/docs/wanx-api/camera-control.md):
-- Endpoints > Hunyuan Video [How to Make a Hunyuan API Call](https://piapi.ai/docs/hunyuan-api-doc.md):
-- Endpoints > Hunyuan Video [Available Hunyuan Lora models](https://piapi.ai/docs/hunyuan-lora-type.md):
+- Endpoints > WanX [Use Cases for Wanx Control Camera](https://piapi.ai/docs/wanx-api/camera-control.md): 
+- Endpoints > Hunyuan Video [How to Make a Hunyuan API Call](https://piapi.ai/docs/hunyuan-api-doc.md): 
+- Endpoints > Hunyuan Video [Available Hunyuan Lora models](https://piapi.ai/docs/hunyuan-lora-type.md): 
 - Endpoints > LLM [PiAPI/How to Avoid Timeouts in Completion API](https://piapi.ai/docs/llm-timeout.md): PiAPI/How To Avoid Timeouts in Completion API
-- Endpoints > Song(Udio) [Song API Task Creation Examples](https://piapi.ai/docs/music-api/music-task-examples.md):
-- Endpoints > Song(Udio) [[Udio] Song Extend](https://piapi.ai/docs/song-api/udio-song-extend.md):
+- Endpoints > Song(Udio) [Song API Task Creation Examples](https://piapi.ai/docs/music-api/music-task-examples.md): 
+- Endpoints > Song(Udio) [[Udio] Song Extend](https://piapi.ai/docs/song-api/udio-song-extend.md): 
 - Endpoints > Midjourney [Penalties - Midjourney API - PiAPI docs](https://piapi.ai/docs/midjourney-api/penalties.md): The Penalties policies on Midjourney API Usage (including Bulk Generation Services, Error Task Penalty, Relax Task Penalty) from PiAPI
 - Endpoints > Midjourney [Task Result Explaination - Midjourney API - PiAPI docs](https://piapi.ai/docs/midjourney-api/task-result-explaination.md): The Detailed Explaination on Midjourney Task Result, including temporary urls, intermediate urls, from PiAPI
-- Endpoints > Midjourney [Midjourney V7 API Instructions](https://piapi.ai/docs/midjourney-api/v7.md):
-- Endpoints > Tools [File Upload API](https://piapi.ai/docs/tools/file-upload.md):
-- Endpoints > GPT image [GPT-image API](https://piapi.ai/docs/gpt-image/gpt-image-api.md):
-- Endpoints > Claude Code [Claude Code Usage Guide](https://piapi.ai/docs/claude-code/usage-guide.md):
+- Endpoints > Midjourney [Midjourney V7 API Instructions](https://piapi.ai/docs/midjourney-api/v7.md): 
+- Endpoints > Tools [File Upload API](https://piapi.ai/docs/tools/file-upload.md): 
+- Endpoints > GPT image [GPT-image API](https://piapi.ai/docs/gpt-image/gpt-image-api.md): 
+- Endpoints > Claude Code [Claude Code Usage Guide](https://piapi.ai/docs/claude-code/usage-guide.md): 
 - Resources [Change Log - PiAPI docs](https://piapi.ai/docs/changelog.md): The Change Log of PiAPI's API service, read about the latest updates and fixes on here!
-- Resources [Output Storage - PiAPI docs](https://piapi.ai/docs/output-storage.md): The output storage policy of PiAPI's API service, read about the how long we will store the outputs for.
-- Resources [Unified API schema - PiAPI docs](https://piapi.ai/docs/unified-api-schema.md): The Unified API schema of PiAPI - allows users to call all of our AI Model with just two endpoints.
+- Resources [Output Storage - PiAPI docs](https://piapi.ai/docs/output-storage.md): The output storage policy of PiAPI's API service, read about the how long we will store the outputs for. 
+- Resources [Unified API schema - PiAPI docs](https://piapi.ai/docs/unified-api-schema.md): The Unified API schema of PiAPI - allows users to call all of our AI Model with just two endpoints. 
 - Resources [Unified Webhook - PiAPI docs](https://piapi.ai/docs/unified-webhook.md): The Unified Webhook of PiAPI - allows users to receive timely task updates and notifications
-- Resources [Bulk Generation - PiAPI docs](https://piapi.ai/docs/bulk-generation.md): Bulk Generation Services offered by PiAPI - perfect for generating a large amount of out using Midjourney, Luma Dream Machine, Kling and/or Flux,
+- Resources [Bulk Generation - PiAPI docs](https://piapi.ai/docs/bulk-generation.md): Bulk Generation Services offered by PiAPI - perfect for generating a large amount of out using Midjourney, Luma Dream Machine, Kling and/or Flux, 
 - Resources [Billings - PiAPI docs](https://piapi.ai/docs/billings.md): PiAPI's billing info - learn how to choose usage modes and sucscription plans that suit you best.
 - Resources [PiAPI MCP Server](https://piapi.ai/docs/mcp-server.md): How to use PiAPI MCP server in your LLM mcp client
 - Resources > Workspace Manual [Host-your-account using back-up account](https://piapi.ai/docs/hya-backup-account.md): Using back up account to increase service reliability
 - Resources > Workspace Manual [Host-your-account Debug Checklist](https://piapi.ai/docs/hya-debug-checklist.md): This checklist helps users to debug potential issues when connecting their accounts to their HYA seats.
-- Resources > Workspace Manual [Host-your-account Status of your Connected Accounts](https://piapi.ai/docs/hya-connected-account-status.md): This page is used to debug the different status of your hosted account.
-- Resources > Announcements [PiAPI 2025 January 1st Pricing Update](https://piapi.ai/docs/announcements/2025-jan-pricing-update.md):
-- Resources > Announcements [The discontinued support for midjourney](https://piapi.ai/docs/sunsetting-midjourney.md):
-- Resources > Announcements [Sunsetting Suno](https://piapi.ai/docs/sunsetting-suno.md):
+- Resources > Workspace Manual [Host-your-account Status of your Connected Accounts](https://piapi.ai/docs/hya-connected-account-status.md): This page is used to debug the different status of your hosted account. 
+- Resources > Announcements [PiAPI 2025 January 1st Pricing Update](https://piapi.ai/docs/announcements/2025-jan-pricing-update.md): 
+- Resources > Announcements [The discontinued support for midjourney](https://piapi.ai/docs/sunsetting-midjourney.md): 
+- Resources > Announcements [Sunsetting Suno](https://piapi.ai/docs/sunsetting-suno.md): 
 
 ## API Docs
-- Endpoints > Flux > Create Task [Create text-to-image task - Flux API - PiAPI docs](https://piapi.ai/docs/flux-api/text-to-image.md): The Create text-to-image endpoint of the Flux API
-- Endpoints > Flux > Create Task [Create image-to-image task - Flux API - PiAPI docs](https://piapi.ai/docs/flux-api/image-to-image.md): The Create image-to-image endpoint of the Flux API
-- Endpoints > Flux > Create Task [Create kontext task - Flux API - PiAPI docs](https://piapi.ai/docs/flux-api/kontext.md): The Create kontext endpoint of the Flux API
-- Endpoints > Flux [Get Task - Flux API - PiAPI docs](https://piapi.ai/docs/flux-api/get-task.md): The Get Task endpoint of the Flux API
-- Endpoints > Gemini [Gemini-2.5-flash-image](https://piapi.ai/docs/gemini-api/gemini-25-flash-image.md): This is provided as Gemini flash image API.  available models:
-- Endpoints > Gemini [Nano Banana Pro](https://piapi.ai/docs/gemini-api/nano-banana-pro.md): This is provided as Nano Banana Pro image API.  available models:
+- Endpoints > Flux > Create Task [Create text-to-image task - Flux API - PiAPI docs](https://piapi.ai/docs/flux-api/text-to-image.md): The Create text-to-image endpoint of the Flux API 
+- Endpoints > Flux > Create Task [Create image-to-image task - Flux API - PiAPI docs](https://piapi.ai/docs/flux-api/image-to-image.md): The Create image-to-image endpoint of the Flux API 
+- Endpoints > Flux > Create Task [Create kontext task - Flux API - PiAPI docs](https://piapi.ai/docs/flux-api/kontext.md): The Create kontext endpoint of the Flux API 
+- Endpoints > Flux [Get Task - Flux API - PiAPI docs](https://piapi.ai/docs/flux-api/get-task.md): The Get Task endpoint of the Flux API 
+- Endpoints > Gemini [Gemini-2.5-flash-image](https://piapi.ai/docs/gemini-api/gemini-25-flash-image.md): This is provided as Gemini flash image API.  available models: 
+- Endpoints > Gemini [Nano Banana Pro](https://piapi.ai/docs/gemini-api/nano-banana-pro.md): This is provided as Nano Banana Pro image API.  available models: 
 - Endpoints > Gemini [Nano Banana 2](https://piapi.ai/docs/gemini-api/nano-banana-2.md): Nano Banana 2 is a next-generation image generation model powered by Google Gemini. It supports both text-to-image and image-to-image generation with flexible resolution and aspect ratio options.
 - Endpoints > Gemini [Get Gemini Task](https://piapi.ai/docs/gemini-api/get-task.md): Get Gemini Task
 - Endpoints > Qwen Image [Text to Imgae-qwen](https://piapi.ai/docs/qwen-image-api/text-to-image.md): Text to Imgae
-- Endpoints > Qwen Image [Image Edit](https://piapi.ai/docs/qwen-image-api/image-edit.md): This is provided as Qwen image edit(2509) API.  available models:
+- Endpoints > Qwen Image [Image Edit](https://piapi.ai/docs/qwen-image-api/image-edit.md): This is provided as Qwen image edit(2509) API.  available models: 
 - Endpoints > Qwen Image [Get Qwen Task](https://piapi.ai/docs/qwen-image-api/get-task.md): Get Qwen Task
 - Endpoints > Z-Image [Text to Image-Zimage](https://piapi.ai/docs/z-image-api/text-to-image.md): z image text to image
 - Endpoints > Z-Image [Get Zimage Task](https://piapi.ai/docs/z-image-api/get-task.md): Get Zimage Task
@@ -61,7 +61,7 @@
 - Endpoints > Seedream [Get Task](https://piapi.ai/docs/seedream-api/get-task.md): This endpoint retrieves the output of a Seedream 5 Lite task.
 - Endpoints > Faceswap [PiAPI/Multi Faceswap](https://piapi.ai/docs/multi-face-swap/create-task.md): This async endpoint from swaps the face from the swap_image to the target_image.
 - Endpoints > Faceswap [Create Task - Faceswap API - PiAPI docs](https://piapi.ai/docs/faceswap-api/create-task.md): The Create Task Endpoint of Faceswap API from PiAPI
-- Endpoints > Faceswap [Video Faceswap API](https://piapi.ai/docs/faceswap-api/video-faceswap.md): PiAPI's Video Face Swap service enables face replacement in videos using advanced facial recognition and swapping technology.
+- Endpoints > Faceswap [Video Faceswap API](https://piapi.ai/docs/faceswap-api/video-faceswap.md): PiAPI's Video Face Swap service enables face replacement in videos using advanced facial recognition and swapping technology. 
 - Endpoints > Faceswap [Get Task - Faceswap API - PiAPI docs](https://piapi.ai/docs/faceswap-api/get-task.md): The Get Task Endpoint of Faceswap API from PiAPI
 - Endpoints > Kling > Cancel Task [Cancel Single Task - Kling API - PiAPI docs](https://piapi.ai/docs/kling-api/cancel-task.md): The Cancel Single Task Endpoint of Kling API from PiAPI
 - Endpoints > Kling > Cancel Task [Cancel Multiple Tasks - Kling API - PiAPI docs](https://piapi.ai/docs/kling-api/cancel-tasks.md): The Cancel Multiple Tasks Endpoint of Kling API from PiAPI
@@ -77,22 +77,21 @@
 - Endpoints > Kling omni [Kling o1](https://piapi.ai/docs/kling-api/kling-o1-api.md): This is the api for Kling's video generation API.
 - Endpoints > Kling omni [Kling 3.0 omni](https://piapi.ai/docs/kling-api/kling-3-omni-api.md): This is the api for Kling's video generation API. Kling 3.0 Omni is a upgraded version of Kling o1.
 - Endpoints > Kling omni [Get Task -Kling omini API - PiAPI docs](https://piapi.ai/docs/kling-api/omni-get-task.md): Get Task -Kling omini API
-- Endpoints > Omni Human [OmniHuman 1.5](https://piapi.ai/docs/omni-human-api/omni-human-1-5.md): This is provided as OmniHuman 1.5 Video Generation API.  available models:
+- Endpoints > Omni Human [OmniHuman 1.5](https://piapi.ai/docs/omni-human-api/omni-human-1-5.md): This is provided as OmniHuman 1.5 Video Generation API.  available models: 
 - Endpoints > Omni Human [Get Task -ominihuman API - PiAPI docs](https://piapi.ai/docs/omni-human-api/get-task.md): Get Task -ominihuman API
-- Endpoints > Seedance [Seedance 2 preview](https://piapi.ai/docs/seedance-api/seedance-2-preview.md): # Overview
 - Endpoints > Seedance [Seedance 2](https://piapi.ai/docs/seedance-api/seedance-2.md): # Overview
 - Endpoints > Seedance [Video Watermark Remover](https://piapi.ai/docs/seedance-api/video-watermark-remover.md): Remove watermarks from videos using AI. The service automatically detects and removes watermarks while preserving original video quality.
 - Endpoints > Seedance [Get Task -Seedance API - PiAPI docs](https://piapi.ai/docs/seedance-api/get-task.md): Get Task -Seedance API
-- Endpoints > Veo3 [Veo3 Text to Video](https://piapi.ai/docs/veo3-api/text-to-video.md): This is provided as Veo3 Video Text to Video API.  available models:
-- Endpoints > Veo3 [Veo3 Image to Video](https://piapi.ai/docs/veo3-api/image-to-video.md): This is provided as Veo3 Video Text to Video API.  available models:
-- Endpoints > Veo3 [Veo3.1 Text to Video](https://piapi.ai/docs/veo31-api/text-to-video.md): This is provided as Veo3.1 Video Text to Video API.  available models:
-- Endpoints > Veo3 [Veo3.1 Image to Video](https://piapi.ai/docs/veo31-api/image-to-video.md): This is provided as Veo3.1 Video Text to Video API.  available models:
-- Endpoints > Veo3 [Get Task -Veo3 API - PiAPI docs](https://piapi.ai/docs/veo3-api/get-task.md): Get Task -Veo3 API
-- Endpoints > Sora2 [Sora2-preview Text to Video](https://piapi.ai/docs/sora2-preview-api/text-to-video.md): This is provided as Sora2-preview Text to Video API(stream).  available models:
-- Endpoints > Sora2 [Sora2 Text to Video](https://piapi.ai/docs/sora2-api/text-to-video.md): This is provided as Sora2 Text to Video API.  available models:
-- Endpoints > Sora2 [Sora2-Pro Text to Video](https://piapi.ai/docs/sora2-pro-api/text-to-video.md): This is provided as Sora2 Pro Text to Video API.  available models:
-- Endpoints > Sora2 [Sora2 Remove Watermark](https://piapi.ai/docs/sora2-api/remove-watermark.md): This is provided as Sora2 Video Remove Watermark API.  available models:
-- Endpoints > Sora2 [Get Task -Sora2 API - PiAPI docs](https://piapi.ai/docs/sora2-api/get-task.md): Get Task -Sora2 API
+- Endpoints > Veo3 [Veo3 Text to Video](https://piapi.ai/docs/veo3-api/text-to-video.md): This is provided as Veo3 Video Text to Video API.  available models: 
+- Endpoints > Veo3 [Veo3 Image to Video](https://piapi.ai/docs/veo3-api/image-to-video.md): This is provided as Veo3 Video Text to Video API.  available models: 
+- Endpoints > Veo3 [Veo3.1 Text to Video](https://piapi.ai/docs/veo31-api/text-to-video.md): This is provided as Veo3.1 Video Text to Video API.  available models: 
+- Endpoints > Veo3 [Veo3.1 Image to Video](https://piapi.ai/docs/veo31-api/image-to-video.md): This is provided as Veo3.1 Video Text to Video API.  available models: 
+- Endpoints > Veo3 [Get Task -Veo3 API - PiAPI docs](https://piapi.ai/docs/veo3-api/get-task.md): Get Task -Veo3 API 
+- Endpoints > Sora2 [Sora2-preview Text to Video](https://piapi.ai/docs/sora2-preview-api/text-to-video.md): This is provided as Sora2-preview Text to Video API(stream).  available models: 
+- Endpoints > Sora2 [Sora2 Text to Video](https://piapi.ai/docs/sora2-api/text-to-video.md): This is provided as Sora2 Text to Video API.  available models: 
+- Endpoints > Sora2 [Sora2-Pro Text to Video](https://piapi.ai/docs/sora2-pro-api/text-to-video.md): This is provided as Sora2 Pro Text to Video API.  available models: 
+- Endpoints > Sora2 [Sora2 Remove Watermark](https://piapi.ai/docs/sora2-api/remove-watermark.md): This is provided as Sora2 Video Remove Watermark API.  available models: 
+- Endpoints > Sora2 [Get Task -Sora2 API - PiAPI docs](https://piapi.ai/docs/sora2-api/get-task.md): Get Task -Sora2 API 
 - Endpoints > WanX [Create  wan22 Task](https://piapi.ai/docs/wanx-api/create-task.md): Create  wan22 Task
 - Endpoints > WanX [PiAPI/Wanx-Get Task](https://piapi.ai/docs/wanx-api/get-task.md): This endpoint from PiAPI's Wanx API retrieves the output of the Wanx task.
 - Endpoints > Wan [Wan2.6 Text to Video](https://piapi.ai/docs/wan-api/wan26-text-to-video.md): This is provided as part of the [Wan2.6 API](https://piapi.ai/wan/wan-2-6) Wan2.6 Text to Video API.
@@ -117,22 +116,22 @@
 - Endpoints > Song(Udio) [[Udio] Generate Lyrics](https://piapi.ai/docs/song-api/udio-generate-lyrics.md):  Uses Udio to synthesize lyrics.
 - Endpoints > Mmaudio [Mmaudio API-Get Task](https://piapi.ai/docs/mmaudio-api/get-task.md): This endpoint from PiAPI's mmaudio API retrieves the output of the mmaudio task where users could check their task output.
 - Endpoints > Mmaudio [Mmaudio API-Generate Audio based on Video](https://piapi.ai/docs/mmaudio-api/create-task.md): This endpoint from PiAPI's mmaudio API can generate audio based on video and prompt provided.
-- Endpoints > DiffRhythm [PiAPI/DiffRhythm-Create Task](https://piapi.ai/docs/diffrhythm-api/create-task.md): This endpoint from PiAPI's DiffRhythm API can generate audio based on prompt or reference audio with lyrics.
+- Endpoints > DiffRhythm [PiAPI/DiffRhythm-Create Task](https://piapi.ai/docs/diffrhythm-api/create-task.md): This endpoint from PiAPI's DiffRhythm API can generate audio based on prompt or reference audio with lyrics. 
 - Endpoints > DiffRhythm [PiAPI/DiffRhythm-Get Task](https://piapi.ai/docs/diffrhythm/get-task.md): This endpoint from PiAPI's DiffRhythm API retrieves the output of the DiffRhythm task where users could check their task output.
-- Endpoints > Ace Step > Create Task [PiAPI/Ace Step-Text to Audio](https://piapi.ai/docs/ace-step-api/text-to-audio.md): This endpoint from PiAPI's Ace Step API can generate audio based on prompt with lyrics.
-- Endpoints > Ace Step > Create Task [PiAPI/Ace Step-Audio to Audio](https://piapi.ai/docs/ace-step-api/audio-to-audio.md): This endpoint from PiAPI's Ace Step API can generate audio based on prompt with audio.
-- Endpoints > Ace Step > Create Task [PiAPI/Ace Step-Audio Edit](https://piapi.ai/docs/ace-step-api/audio-edit.md): This endpoint from PiAPI's Ace Step API can edit audio based on prompt with lyrics.
-- Endpoints > Ace Step > Create Task [PiAPI/Ace Step-Audio Extend](https://piapi.ai/docs/ace-step-api/audio-extend.md): This endpoint from PiAPI's Ace Step API can extend audio based on prompt with lyrics.
+- Endpoints > Ace Step > Create Task [PiAPI/Ace Step-Text to Audio](https://piapi.ai/docs/ace-step-api/text-to-audio.md): This endpoint from PiAPI's Ace Step API can generate audio based on prompt with lyrics. 
+- Endpoints > Ace Step > Create Task [PiAPI/Ace Step-Audio to Audio](https://piapi.ai/docs/ace-step-api/audio-to-audio.md): This endpoint from PiAPI's Ace Step API can generate audio based on prompt with audio. 
+- Endpoints > Ace Step > Create Task [PiAPI/Ace Step-Audio Edit](https://piapi.ai/docs/ace-step-api/audio-edit.md): This endpoint from PiAPI's Ace Step API can edit audio based on prompt with lyrics. 
+- Endpoints > Ace Step > Create Task [PiAPI/Ace Step-Audio Extend](https://piapi.ai/docs/ace-step-api/audio-extend.md): This endpoint from PiAPI's Ace Step API can extend audio based on prompt with lyrics. 
 - Endpoints > Ace Step [PiAPI/Ace Step-Get Task](https://piapi.ai/docs/ace-step-api/get-task.md): This endpoint from PiAPI's Ace Step API retrieves the output of the Ace Step task where users could check their task output.
 - Endpoints > TTS [F5 TTS Zeroshot TTS API](https://piapi.ai/docs/tts-api/f5-tts.md): # PiAPI Text-to-Speech API Documentation
 - Endpoints > TTS [PiAPI/TTS/Get Task](https://piapi.ai/docs/tts-get-task.md): Retrieve the output of a TTS task.
 - Endpoints > Trellis [Create Task - Trellis API](https://piapi.ai/docs/trellis-api/create-task.md): Create Task - Trellis of PiAPI
 - Endpoints > Trellis [Trellis2 Create Task](https://piapi.ai/docs/trellis2-api/create-task.md): ::::info
 - Endpoints > Trellis [Trellis/PiAPI-Get Task](https://piapi.ai/docs/trellis-api/get-task.md): This endpoint from PiAPI's Trellis API retrieves the output of a Trellis 3D model generation task.
-- Endpoints > Joycaption [PiAPI/Joycaption-Create Task](https://piapi.ai/docs/joycaption-api/create-task.md): This endpoint from PiAPI's Joycatipn API can generate prompt/tag list based on image.
+- Endpoints > Joycaption [PiAPI/Joycaption-Create Task](https://piapi.ai/docs/joycaption-api/create-task.md): This endpoint from PiAPI's Joycatipn API can generate prompt/tag list based on image. 
 - Endpoints > Joycaption [PiAPI/Joycaption-Get Task](https://piapi.ai/docs/joycaption/get-task.md): This endpoint from PiAPI's Joycaption API retrieves the output of the Joycaption task where users could check their task output.
 - Endpoints > Midjourney > Create Task [Imagine Endpoint -Midjourney API - PiAPI Docs ](https://piapi.ai/docs/midjourney-api/imagine.md): The Imagine Endpoint of Midjourney API of PiAPI's docs
-- Endpoints > Midjourney > Create Task [Upscale Endpoint - Midjourney API - PiAPI Docs ](https://piapi.ai/docs/midjourney-api/upscale.md): Upscale Endpoint - Midjourney API - PiAPI Docs
+- Endpoints > Midjourney > Create Task [Upscale Endpoint - Midjourney API - PiAPI Docs ](https://piapi.ai/docs/midjourney-api/upscale.md): Upscale Endpoint - Midjourney API - PiAPI Docs 
 - Endpoints > Midjourney > Create Task [variation Endpoint - Midjourney API - PiAPI Docs ](https://piapi.ai/docs/midjourney-api/variation.md): The variation Endpoint of Midjourney API of PiAPI's docs
 
 - Endpoints > Midjourney > Create Task [reroll Endpoint - Midjourney API - PiAPI Docs ](https://piapi.ai/docs/midjourney-api/reroll.md): The reroll Endpoint of Midjourney API of PiAPI's docs
@@ -151,11 +150,11 @@
 - Endpoints > Midjourney > Cancel Task [Cancel Single Task - Midjourney API - PiAPI docs](https://piapi.ai/docs/midjourney-api/cancel-task.md): The Cancel Single Task Endpoint of Midjourney API from PiAPI
 - Endpoints > Midjourney > Cancel Task [Cancel Multiple Tasks - Midjourney API - PiAPI docs](https://piapi.ai/docs/midjourney-api/cancel-tasks.md): The Cancel Multiple Tasks Endpoint of Midjourney API from PiAPI
 - Endpoints > Midjourney [Get task - Midjourney API - PiAPI docs](https://piapi.ai/docs/midjourney-api/get-task.md): The Get Task Endpoint of Midjourney API from PiAPI
-- Endpoints > AI Hug [Get task - AI Hug API - PiAPI docs](https://piapi.ai/docs/ai-hug-api/get-task.md): The Get Task endpoint of the AI Hug API
+- Endpoints > AI Hug [Get task - AI Hug API - PiAPI docs](https://piapi.ai/docs/ai-hug-api/get-task.md): The Get Task endpoint of the AI Hug API 
 - Endpoints > AI Hug [AI HUG API Create Task - PiAPI](https://piapi.ai/docs/ai-hug-api/create-task.md): AI HUG API Create Task - PiAPI
 - Endpoints > Tools [Remove Background API](https://piapi.ai/docs/image-editing-api/remove-background-api.md): Pricing: $0.001/generation
 - Endpoints > Tools [PiAPI/Remove Background-Get Task](https://piapi.ai/docs/remove-background/get-task.md): This endpoint from PiAPI's Remove Background API retrieves the output of the Remove Background task where users could check their task output.
-- Endpoints > Tools [Segment With Prompt API](https://piapi.ai/docs/image-editing-api/segment-with-prompt-api.md): | Model | Price (USD) |
+- Endpoints > Tools [Segment With Prompt API](https://piapi.ai/docs/image-editing-api/segment-with-prompt-api.md): | Model | Price (USD) | 
 - Endpoints > Tools [PiAPI/Segment With Prompt-Get Task](https://piapi.ai/docs/segment-with-prompt/get-task.md): This endpoint from [PiAPI's Segment With Prompt API] retrieves the output of the Segment With Prompt task where users could check their task output.
 - Endpoints > Tools [Image Upscale(Super Resolution) API](https://piapi.ai/docs/image-editing-api/super-resolution-api.md): ## Pricing
 - Endpoints > Tools [PiAPI/Image Upscale-Get Task](https://piapi.ai/docs/image-upscale/get-task.md): This endpoint from PiAPI's Image-Upscale API retrieves the output of the Image Upscale task where users could check their task output.
@@ -168,35 +167,35 @@
 - Endpoints > PiAPI Account Management [PiAPI/User History Query API](https://piapi.ai/docs/piapi-user-history-query.md): To enable users to access their history more conveniently and efficiently, we have provided a User History Query API.
 
 ## Schemas
-- Schemas [motion brush](https://piapi.ai/docs/3945687d0.md):
-- Schemas [Create Task](https://piapi.ai/docs/3395436d0.md):
-- Schemas [camera control](https://piapi.ai/docs/3448140d0.md):
-- Schemas [Cancel Params](https://piapi.ai/docs/3600684d0.md):
-- Schemas [Float2 Point](https://piapi.ai/docs/3945678d0.md):
-- Schemas [Control Points](https://piapi.ai/docs/3945680d0.md):
-- Schemas [txt2video-1.3b](https://piapi.ai/docs/5442629d0.md):
-- Schemas [txt2video-14b](https://piapi.ai/docs/5442631d0.md):
-- Schemas [txt2video-14b-lora](https://piapi.ai/docs/6008930d0.md):
-- Schemas [img2video-14b](https://piapi.ai/docs/5442632d0.md):
-- Schemas [img2video-14b-lora](https://piapi.ai/docs/6755163d0.md):
-- Schemas [img2video-14b-keyframe](https://piapi.ai/docs/5955074d0.md):
-- Schemas [img2video-14b-control-camera](https://piapi.ai/docs/6755182d0.md):
-- Schemas [wan22-txt2video-14b](https://piapi.ai/docs/8595418d0.md):
-- Schemas [wan22-img2video-14b](https://piapi.ai/docs/8595420d0.md):
-- Schemas [hunyuan-txt2video-lora](https://piapi.ai/docs/6074963d0.md):
-- Schemas [Trellis API/text-to-3D](https://piapi.ai/docs/6470675d0.md):
-- Schemas [Trellis API/image-to-3D](https://piapi.ai/docs/6470710d0.md):
-- Schemas [Trellis2 API/image-to-3D](https://piapi.ai/docs/11930862d0.md):
-- Schemas [Kling omni multi shot](https://piapi.ai/docs/12763693d0.md):
-- Schemas [VideoGenerationRequest](https://piapi.ai/docs/4870802d0.md):
-- Schemas [TaskRequest](https://piapi.ai/docs/5456388d0.md):
-- Schemas [VideoGenerationResponse](https://piapi.ai/docs/4870803d0.md):
-- Schemas [TaskConfig](https://piapi.ai/docs/5442630d0.md):
-- Schemas [TaskInput](https://piapi.ai/docs/5456389d0.md):
-- Schemas [TaskResponse](https://piapi.ai/docs/5442633d0.md):
-- Schemas [ErrorResponse](https://piapi.ai/docs/5442634d0.md):
-- Response [Unified-Task-Response](https://piapi.ai/docs/3395213d0.md):
-- RequestBodies [Unified-Task-Request-Body](https://piapi.ai/docs/3395214d0.md):
-- [config](https://piapi.ai/docs/3417447d0.md):
-- [control_net_setting](https://piapi.ai/docs/3417679d0.md):
-- [lora_setting](https://piapi.ai/docs/3417683d0.md):
+- Schemas [motion brush](https://piapi.ai/docs/3945687d0.md): 
+- Schemas [Create Task](https://piapi.ai/docs/3395436d0.md): 
+- Schemas [camera control](https://piapi.ai/docs/3448140d0.md): 
+- Schemas [Cancel Params](https://piapi.ai/docs/3600684d0.md): 
+- Schemas [Float2 Point](https://piapi.ai/docs/3945678d0.md): 
+- Schemas [Control Points](https://piapi.ai/docs/3945680d0.md): 
+- Schemas [txt2video-1.3b](https://piapi.ai/docs/5442629d0.md): 
+- Schemas [txt2video-14b](https://piapi.ai/docs/5442631d0.md): 
+- Schemas [txt2video-14b-lora](https://piapi.ai/docs/6008930d0.md): 
+- Schemas [img2video-14b](https://piapi.ai/docs/5442632d0.md): 
+- Schemas [img2video-14b-lora](https://piapi.ai/docs/6755163d0.md): 
+- Schemas [img2video-14b-keyframe](https://piapi.ai/docs/5955074d0.md): 
+- Schemas [img2video-14b-control-camera](https://piapi.ai/docs/6755182d0.md): 
+- Schemas [wan22-txt2video-14b](https://piapi.ai/docs/8595418d0.md): 
+- Schemas [wan22-img2video-14b](https://piapi.ai/docs/8595420d0.md): 
+- Schemas [hunyuan-txt2video-lora](https://piapi.ai/docs/6074963d0.md): 
+- Schemas [Trellis API/text-to-3D](https://piapi.ai/docs/6470675d0.md): 
+- Schemas [Trellis API/image-to-3D](https://piapi.ai/docs/6470710d0.md): 
+- Schemas [Trellis2 API/image-to-3D](https://piapi.ai/docs/11930862d0.md): 
+- Schemas [Kling omni multi shot](https://piapi.ai/docs/12763693d0.md): 
+- Schemas [VideoGenerationRequest](https://piapi.ai/docs/4870802d0.md): 
+- Schemas [TaskRequest](https://piapi.ai/docs/5456388d0.md): 
+- Schemas [VideoGenerationResponse](https://piapi.ai/docs/4870803d0.md): 
+- Schemas [TaskConfig](https://piapi.ai/docs/5442630d0.md): 
+- Schemas [TaskInput](https://piapi.ai/docs/5456389d0.md): 
+- Schemas [TaskResponse](https://piapi.ai/docs/5442633d0.md): 
+- Schemas [ErrorResponse](https://piapi.ai/docs/5442634d0.md): 
+- Response [Unified-Task-Response](https://piapi.ai/docs/3395213d0.md): 
+- RequestBodies [Unified-Task-Request-Body](https://piapi.ai/docs/3395214d0.md): 
+- [config](https://piapi.ai/docs/3417447d0.md): 
+- [control_net_setting](https://piapi.ai/docs/3417679d0.md): 
+- [lora_setting](https://piapi.ai/docs/3417683d0.md): 

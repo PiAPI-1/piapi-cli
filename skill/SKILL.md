@@ -1,11 +1,11 @@
 ---
 name: piapi-cli
-description: Use piapi to call 94 multimodal AI models — image (flux/midjourney/qwen/nano-banana/seedream/z-image/gpt-image), video (sora2/veo3/kling/hailuo/wan/seedance/skyreels/framepack/hunyuan/luma/omni-human/ai-hug), audio (udio/ace-step/mmaudio/diffrhythm/f5-tts), 3D (trellis), LLM (gpt/claude/gemini) — from the terminal. Auto-routes between PiAPI's unified task API and OpenAI-compatible endpoints. Supports key=value inputs, async tasks, polling, and webhook callbacks.
+description: Use piapi to call 97 multimodal AI models — image (flux/midjourney/qwen/nano-banana/seedream/z-image/gpt-image), video (sora2/veo3/kling/hailuo/wan/seedance/skyreels/framepack/hunyuan/luma/omni-human/ai-hug), audio (udio/ace-step/mmaudio/diffrhythm/f5-tts), 3D (trellis), LLM (gpt/claude/gemini) — from the terminal. Auto-routes between PiAPI's unified task API and OpenAI-compatible endpoints. Supports key=value inputs, async tasks, polling, and webhook callbacks.
 ---
 
 # PiAPI CLI — Agent Skill Guide
 
-Use `piapi` to call 94 multimodal AI models via the PiAPI unified API.
+Use `piapi` to call 97 multimodal AI models via the PiAPI unified API.
 
 ## Prerequisites
 
@@ -92,7 +92,7 @@ stdout still shows the URL lines for grepping.
 | `--out-dir <path>` | Download outputs to directory (default: cwd) |
 | `--download` | Save every result URL to disk after the task completes |
 
-**Models** (94 entries, every one verified against PiAPI docs).
+**Models** (97 entries, every one verified against PiAPI docs).
 For the full live list, run `piapi model list` — the catalog is the
 source of truth. Highlights below:
 
@@ -100,7 +100,8 @@ source of truth. Highlights below:
   `flux-dev-advanced`, `flux-img2img`, `flux-kontext`, `flux-inpaint`,
   `flux-outpaint`, `flux-redux`, `midjourney`, `mj-{upscale,variation,reroll,describe,seed,blend,inpaint,outpaint,pan}`,
   `nano-banana-pro`, `nano-banana-2`, `gemini-2.5-flash-image`,
-  `qwen-image`, `qwen-image-edit`, `z-image`, `seedream-5-lite`
+  `qwen-image`, `qwen-image-edit`, `z-image`, `seedream-5-lite`,
+  `seedream-5-lite-less-restriction`
 - **Image tools** (unified): `remove-bg`, `upscale`, `segment`, `joycaption`, `faceswap`, `multi-faceswap`
 - **Image generation** (OpenAI-compat): `gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`
 - **Video** (all async unified): `sora2`, `sora2-pro`, `sora2-watermark`,
@@ -111,7 +112,8 @@ source of truth. Highlights below:
   `omni-human`, `ai-hug-video`,
   `wan2.6`, `wan2.6-img2vid`, `wanx-lora`, `wanx-lora-img2vid`,
   `wanx-keyframe`, `wanx-camera`, `wanx22`, `wanx22-img2vid`,
-  `seedance-2`, `seedance-2-preview`, `seedance-watermark`
+  `seedance-2`, `seedance-2-fast`, `seedance-2-less-restriction`,
+  `seedance-2-fast-less-restriction`, `seedance-watermark`
 - **Video tools** (async unified): `video-upscale`, `video-remove-bg`, `video-faceswap`
 - **Video** (OpenAI-compat streaming): `sora2-preview`, `sora2-hd-preview` — emits markdown progress + final video URL via SSE; the CLI streams chunks to stdout and prints `url: …` lines at the end
 - **Audio** (unified): `udio-music`, `udio-song-extend`, `udio-lyrics`,
@@ -120,6 +122,14 @@ source of truth. Highlights below:
 - **3D** (async unified): `trellis`, `trellis2`
 - **LLM** (OpenAI-compat): `gpt-5`, `gpt-5.2`, `gpt-4o`, `gpt-4o-mini`,
   `gpt-4.1`, `claude-opus-4.6`, `claude-sonnet-4.6`, `gemini-2.5-flash-nothinking`
+
+**Less-restriction variants** (`seedance-2-less-restriction`,
+`seedance-2-fast-less-restriction`, `seedream-5-lite-less-restriction`):
+same engine and input schema as the strict models, more permissive content
+review, +25% price, and no retry on a content rejection (credits refunded).
+Hard blocks still apply (minors, real/photorealistic face references,
+graphic violence). Prefer the strict default unless the strict variant
+keeps rejecting legitimate stylistic/adult content.
 
 ### piapi task list
 

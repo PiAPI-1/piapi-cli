@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>piapi — 一个二进制，94 个多模态 AI 模型</strong><br>
+  <strong>piapi — 一个二进制，97 个多模态 AI 模型</strong><br>
   在终端或 AI Agent 中生成图像、视频、音频、3D，以及与 LLM 对话。
 </p>
 
@@ -13,8 +13,8 @@
 
 ## 能力概览
 
-- **图像** — 34 个模型，包括 `flux-dev`、`nano-banana-pro`、`qwen-image-edit`、`seedream-5-lite`、`midjourney`，以及工具类（`remove-bg`、`upscale`、`segment`、`joycaption`、`faceswap`）
-- **视频** — 40 个模型，包括 `sora2-pro`、`kling-3`、`veo3-fast`、`wanx22`、`seedance-2`、`hailuo`、`luma`
+- **图像** — 35 个模型，包括 `flux-dev`、`nano-banana-pro`、`qwen-image-edit`、`seedream-5-lite`、`midjourney`，以及工具类（`remove-bg`、`upscale`、`segment`、`joycaption`、`faceswap`）
+- **视频** — 42 个模型，包括 `sora2-pro`、`kling-3`、`veo3-fast`、`wanx22`、`seedance-2`、`hailuo`、`luma`
 - **音频** — 10 个模型，包括 `mmaudio`（视频转音频）、`f5-tts`、`diffrhythm`、`udio-music`、`ace-step`
 - **3D** — `trellis`（文本转 3D）、`trellis2`（图片转 3D）
 - **LLM** — 8 个对话模型，包括 `gpt-4o`、`claude-sonnet-4.6`、`gpt-5`，以及 `gpt-image-2`（OpenAI 兼容图像生成）
