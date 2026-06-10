@@ -255,7 +255,7 @@ async function runUnified(
         title: model.name,
         taskId: task.task_id,
         status: task.status,
-        hint: `piapi task get ${task.task_id}`,
+        hint: `piapi task wait ${task.task_id}`,
       });
     }
     return;
