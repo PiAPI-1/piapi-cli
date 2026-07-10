@@ -13,10 +13,10 @@
 
 ## Features
 
-- **Image** — 35 models incl. `flux-dev`, `nano-banana-pro`, `qwen-image-edit`, `seedream-5-lite`, `midjourney`, plus tools (`remove-bg`, `upscale`, `segment`, `joycaption`, `faceswap`)
+- **Image** — 37 models incl. `flux-dev`, `nano-banana-pro`, `qwen-image-edit`, `seedream-5-pro`, `midjourney`, plus tools (`remove-bg`, `upscale`, `segment`, `joycaption`, `faceswap`)
 - **Video** — 42 models incl. `sora2-pro`, `kling-3`, `veo3-fast`, `wanx22`, `seedance-2`, `hailuo`, `luma`
-- **Audio** — 10 models incl. `mmaudio` (video→audio), `f5-tts`, `diffrhythm`, `udio-music`, `ace-step`
-- **3D** — `trellis` (text→3D), `trellis2` (image→3D)
+- **Audio** — 11 models incl. `mmaudio` (video→audio), `seed-audio`, `f5-tts`, `diffrhythm`, `udio-music`, `ace-step`
+- **3D** — `trellis` (text→3D), `trellis2` (image→3D), `pixal3d` (image→3D)
 - **LLM** — 8 chat models incl. `gpt-4o`, `claude-sonnet-4.6`, `gpt-5`, plus `gpt-image-2` for OpenAI-compatible image generation
 - **Streaming** — `--stream` for token-by-token LLM output; SSE-only models (`sora2-preview`) stream by default
 - **File I/O** — `key=@./local.png` auto-uploads, `--download` auto-saves every result URL or `b64_json` payload

@@ -93,12 +93,17 @@ export const MODELS: ModelEntry[] = [
   // docs: https://piapi.ai/docs/z-image-api/text-to-image.md
   { name: 'z-image', type: 'image', model: 'Qubico/z-image', taskType: 'txt2img', provider: 'ZImage', verified: true },
 
-  // docs: https://piapi.ai/docs/seedream-api/seedream-5-lite.md
+  // docs: https://piapi.ai/docs/seedream-api/seedream-5.md
   { name: 'seedream-5-lite', type: 'image', model: 'seedream', taskType: 'seedream-5-lite', provider: 'Seedream', verified: true },
-  // Less-restriction variant: same engine and input schema, more permissive
+  // Pro sizes are 1K (default) / 2K; multi-image input fields are ignored here.
+  // docs: https://piapi.ai/docs/seedream-api/seedream-5.md
+  { name: 'seedream-5-pro', type: 'image', model: 'seedream', taskType: 'seedream-5-pro', provider: 'Seedream', verified: true },
+  // Less-restriction variants: same engine and input schema, more permissive
   // content review, +25% price, no retry on content rejection.
   // docs: https://piapi.ai/docs/seedance-api/less-restriction.md
   { name: 'seedream-5-lite-less-restriction', type: 'image', model: 'seedream', taskType: 'seedream-5-lite-less-restriction', provider: 'Seedream', verified: true },
+  // docs: https://piapi.ai/docs/seedance-api/less-restriction.md
+  { name: 'seedream-5-pro-less-restriction', type: 'image', model: 'seedream', taskType: 'seedream-5-pro-less-restriction', provider: 'Seedream', verified: true },
 
   // ========== image tools ==========
   // docs: https://piapi.ai/docs/image-editing-api/remove-background-api.md
@@ -235,12 +240,16 @@ export const MODELS: ModelEntry[] = [
   { name: 'diffrhythm', type: 'audio', model: 'Qubico/diffrhythm', taskType: 'txt2audio-base', provider: 'DiffRhythm', verified: true },
   // docs: https://piapi.ai/docs/tts-api/f5-tts.md
   { name: 'f5-tts', type: 'audio', model: 'Qubico/tts', taskType: 'zero-shot', provider: 'F5TTS', verified: true },
+  // docs: https://piapi.ai/docs/byteaudio-api/seed-audio.md
+  { name: 'seed-audio', type: 'audio', model: 'byteaudio', taskType: 'seed-audio-1.0', provider: 'ByteAudio', verified: true },
 
   // ========== 3d ==========
   // docs: https://piapi.ai/docs/trellis-api/create-task.md
   { name: 'trellis', type: '3d', model: 'Qubico/trellis', taskType: 'text-to-3d', provider: 'Trellis', asyncOnly: true, verified: true },
   // docs: https://piapi.ai/docs/trellis2-api/create-task.md
   { name: 'trellis2', type: '3d', model: 'Qubico/trellis2', taskType: 'image-to-3d', provider: 'Trellis', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/pixal-3d-api/create-task.md
+  { name: 'pixal3d', type: '3d', model: 'Qubico/pixal3d', taskType: 'image-to-3d', provider: 'Pixal3D', asyncOnly: true, verified: true },
 
   // ========== OpenAI-compat: GPT image ==========
   // docs: https://piapi.ai/docs/gpt-image/gpt-image-api.md

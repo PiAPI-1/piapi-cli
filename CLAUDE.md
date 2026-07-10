@@ -1,6 +1,6 @@
 # piapi-cli — Repo Guide
 
-PiAPI 官方 CLI。97 个多模态模型聚合（image/video/audio/3D/LLM）。Bootstrap SaaS 项目，发布到 npm `piapi-cli`。
+PiAPI 官方 CLI。101 个多模态模型聚合（image/video/audio/3D/LLM）。Bootstrap SaaS 项目，发布到 npm `piapi-cli`。
 
 ## 命令
 ```bash
@@ -14,7 +14,7 @@ bun test          # 0 fail，CI gate（数量会涨，别在这硬编码）
 ## 不动的硬约束
 
 - **Brand 颜色只允许 pure blue**。禁紫/粉/青/teal — 这些是通用 AI 工具默认色，要避开。看到这些立刻替换成 `ANSI.blue` 或 `bold + dim`。
-- **97 个 catalog 条目都已对照 PiAPI 文档校验**。每条带 `// docs:` 链接 + `verified: true`。新增模型必须先验证文档才能加。
+- **101 个 catalog 条目都已对照 PiAPI 文档校验**。每条带 `// docs:` 链接 + `verified: true`。新增模型必须先验证文档才能加。
 - **Skip PiAPI 文档标"deprecated"或"service stopped"的接口**（如 Suno）。
 - **对话中文，代码/commit/PR/注释英文**。
 
