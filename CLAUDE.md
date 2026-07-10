@@ -56,12 +56,19 @@ bun test          # 0 fail，CI gate（数量会涨，别在这硬编码）
 1. `bun run typecheck && bun run lint && bun test && bun run build` 全绿
 2. `./dist/piapi.mjs --version` 输出当前 `package.json` 版本（不是 `0.0.0-dev`）
 3. `npm pack --dry-run` 只 4 文件：LICENSE / README.md / dist/piapi.mjs / package.json
-4. tag `v*` 触发 `.github/workflows/release.yml` → GH Release + npm publish（需要 repo `NPM_TOKEN` secret）
+4. tag `v*` 触发 `.github/workflows/release.yml` → npm publish 先跑，成功后才建 GH Release（需要 repo `NPM_TOKEN` secret）
+5. 推 tag 后**必须**核 `npm view piapi-cli version`。workflow 绿 ≠ 发布成功，见「已知坑」
 
 ## 已知坑（修过的别再踩）
 
 - **VERSION 不要硬编码**，必须 `process.env.CLI_VERSION ?? '0.0.0-dev'`，由 `build.ts` define 注入
 - **`registry.printRoot` 不要硬编码 flag 列表**，从 `GLOBAL_OPTIONS` 迭代渲染
-- **`models/schema.ts` 只覆盖 7/97 条目**，`model schema <X>` 错误消息要区分"unknown model"和"no schema defined"
+- **`models/schema.ts` 只覆盖 7/101 条目**，`model schema <X>` 错误消息要区分"unknown model"和"no schema defined"
 - **流式 chat 的 `usage` 可能是 `{}`**，必须 `typeof usage?.total_tokens === 'number'` 才打印
 - **`status-bar.ts` 模块级 `printed` 是设计意图**（一次启动只打一次 banner），别"修复"
+- **npm publish 失败时，`E404` 和 `E403` 是两回事**（v0.3.0 踩过）。对已存在的包 PUT：
+  - `E404 Not Found` = 认证**没通过**（token 失效/过期）。npm 故意不回 401，避免暴露包是否存在
+  - `E403 Forbidden` = 认证通过但**无写权限**（token 是 read-only 或 scope 没覆盖本包）
+  - 一锤定音的判定：`npm whoami` 通 → 排除过期；`npm access get status piapi-cli` 通 → 排除权限。两条都通还发不了才去查别的
+- **npm granular token 默认 30 天过期**。`NPM_TOKEN` secret 建于 2026-06-10，2026-07-10 发 v0.3.0 时正好失效。签发时把有效期拉长，并在 `gh secret list` 里核对创建日期
+- **发布成功以 registry 为准，不看 workflow 是否绿**。`npm publish` 打印 `+ pkg@x.y.z` 也不算数——从 registry 全新装一遍、跑 `--version`、比对 `npm view <pkg>@<v> dist.shasum` 与本地 `npm pack` 的 shasum 才算验完

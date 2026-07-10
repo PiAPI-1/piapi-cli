@@ -20,19 +20,22 @@ jobs:
 
       - run: bun run build
 
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      # npm publish runs first: it is the step that actually fails (expired or
+      # under-scoped NPM_TOKEN). Creating the GitHub Release first would leave a
+      # published tag with no npm artifact behind when publish dies.
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Publish to npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
