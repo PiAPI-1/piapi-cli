@@ -3,6 +3,7 @@ import { resolveAPIKey } from '../auth/resolver';
 import { getModel, unknownModelError } from '../models/catalog';
 import type { ModelEntry } from '../models/catalog';
 import { parseInput } from '../models/input-parser';
+import { Endpoints } from '../client/endpoints';
 import { createTask, getTask } from '../client/unified';
 import {
   chatCompletion,
@@ -13,6 +14,8 @@ import {
   type ChatUsage,
   type ImageRequest,
 } from '../client/openai-compat';
+import { imageEdit, submitImageTask } from '../client/images';
+import { validateImageEditInput } from '../files/image-parts';
 import { pollTask } from '../polling/poll';
 import { uploadFile } from '../files/upload';
 import { resolveLocalFiles } from '../files/resolve';
@@ -67,21 +70,36 @@ async function runOpenAIImage(
   flags: GlobalFlags,
 ): Promise<void> {
   const body = buildImageBody(model.model, input);
+  if (flags.edit) validateImageEditInput(body);
+  const path = flags.async
+    ? (flags.edit ? Endpoints.IMAGE_EDITS_ASYNC : Endpoints.IMAGE_GENERATIONS_ASYNC)
+    : (flags.edit ? Endpoints.IMAGE_EDITS : Endpoints.IMAGE_GENERATIONS);
   if (flags.dryRun) {
-    process.stderr.write(`[DRY RUN] POST ${baseUrl}/v1/images/generations\n`);
+    process.stderr.write(`[DRY RUN] POST ${baseUrl}${path}\n`);
+    if (flags.edit) process.stderr.write('[DRY RUN] Content-Type: multipart/form-data (file references shown, no files read)\n');
     process.stderr.write(`[DRY RUN] Body: ${formatJSON(body)}\n`);
+    return;
+  }
+  if (flags.async) {
+    const task = await withSpinner('Submitting image task…', { quiet: flags.quiet },
+      () => submitImageTask({ apiKey, baseUrl }, body, flags.edit === true));
+    if (getFormatter(flags) === 'json') {
+      process.stdout.write(formatJSON({ task_id: task.task_id, status: task.status }) + '\n');
+    } else {
+      printRunPending({ title: model.name, taskId: task.task_id, status: task.status,
+        hint: `piapi task wait ${task.task_id} --download` });
+    }
     return;
   }
   const t0 = Date.now();
   const res = await withSpinner(
     `Generating image (${model.name})…`,
     { quiet: flags.quiet },
-    () => imageGeneration({ apiKey, baseUrl }, body),
+    () => flags.edit ? imageEdit({ apiKey, baseUrl }, body) : imageGeneration({ apiKey, baseUrl }, body),
   );
   const formatter = getFormatter(flags);
   const urls = extractUrls(res.data);
-  // gpt-image-2 with reference image input returns base64 inline (b64_json)
-  // instead of a URL — capture both modes so --download works either way.
+  // Synchronous generations and edits can both return inline b64_json.
   const b64Items = (res.data ?? [])
     .map((d, i) => ({ index: i, b64: d.b64_json }))
     .filter((x): x is { index: number; b64: string } => typeof x.b64 === 'string' && x.b64.length > 0);
@@ -304,7 +322,8 @@ async function runUnified(
 export default defineCommand({
   name: 'run',
   description: 'Run a model task',
-  usage: 'piapi run <model> key=value... [--async] [--dry-run]',
+  usage: 'piapi run <model> key=value... [--edit] [--async] [--dry-run]',
+  options: [{ flag: '--edit', description: 'Edit GPT images using local image=@file or image:=JSON references' }],
   examples: [
     'piapi run flux-dev prompt="a corgi" aspect_ratio=16:9',
     'piapi run gpt-image-2 prompt="a robot" size=1024x1024',
@@ -325,6 +344,13 @@ export default defineCommand({
       throw new CLIError(message, ExitCode.USAGE, hint);
     }
 
+    const apiType = model.apiType ?? 'unified';
+    if (flags.edit && apiType !== 'openai-images') {
+      throw new CLIError('--edit only applies to GPT image models.', ExitCode.USAGE);
+    }
+    if (apiType === 'openai-images' && flags.webhook && (flags.async || flags.edit)) {
+      throw new CLIError('GPT image edit/async endpoints do not support --webhook.', ExitCode.USAGE);
+    }
     const kvArgs = (flags._positional ?? []).slice(1);
     const userInput = parseInput(kvArgs);
     let input = { ...(model.defaultInput ?? {}), ...userInput };
@@ -343,7 +369,7 @@ export default defineCommand({
     // Auto-upload `@<path>` values to PiAPI's ephemeral resource endpoint
     // and rewrite the input with the returned URLs. Skipped in dry-run so
     // users can see the request shape without consuming credits or network.
-    if (!flags.dryRun) {
+    if (!flags.dryRun && !(apiType === 'openai-images' && flags.edit)) {
       try {
         const resolved = await resolveLocalFiles(input, async (p) => {
           return withSpinner(
@@ -371,7 +397,6 @@ export default defineCommand({
       }
     }
 
-    const apiType = model.apiType ?? 'unified';
     if (flags.stream && apiType !== 'openai-completions' && !flags.quiet) {
       process.stderr.write(`Note: --stream only applies to LLM (chat) models; ignored for ${model.name}.\n`);
     }

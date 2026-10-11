@@ -8,6 +8,7 @@
 //   https://piapi.ai/docs/llm-api/completions.md
 //   https://piapi.ai/docs/gpt-image/gpt-image-api.md
 
+import { Endpoints } from './endpoints';
 import { APIError } from '../errors/api';
 import { DEFAULT_API_TIMEOUT_MS, DEFAULT_IMAGE_TIMEOUT_MS, resolveTimeout, timeoutSignal } from './timeout';
 
@@ -90,7 +91,7 @@ export function chatCompletion(client: OpenAIClient, body: ChatRequest): Promise
 }
 
 export function imageGeneration(client: OpenAIClient, body: ImageRequest): Promise<ImageResponse> {
-  return postBearer<ImageResponse>(client, '/v1/images/generations', body, DEFAULT_IMAGE_TIMEOUT_MS);
+  return postBearer<ImageResponse>(client, Endpoints.IMAGE_GENERATIONS, body, DEFAULT_IMAGE_TIMEOUT_MS);
 }
 
 export type ChatUsage = NonNullable<ChatResponse['usage']>;

@@ -15,6 +15,7 @@ export interface GlobalFlags {
   help?: boolean;
   version?: boolean;
   // command-specific
+  edit?: boolean;
   status?: string;
   limit?: number;
   type?: string;

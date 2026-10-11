@@ -1,5 +1,5 @@
-import { describe, test, expect } from 'bun:test';
-import { mkdtempSync, existsSync, readFileSync, rmSync } from 'node:fs';
+import { describe, test, expect, spyOn } from 'bun:test';
+import { mkdtempSync, existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { extractUrls, renderUnifiedResult } from '../../src/output/task-result';
@@ -60,6 +60,39 @@ describe('renderUnifiedResult', () => {
       expect(e.message).toContain('t-456');
       expect(e.message).toContain('model exploded');
     });
+  });
+
+  test('downloads async GPT image base64 without overwriting prior output', async () => {
+    const outDir = mkdtempSync(join(tmpdir(), 'piapi-async-image-'));
+    try {
+      const task = completedTask({ data: [{ b64_json: Buffer.from('image-bytes').toString('base64') }] });
+      for (let i = 0; i < 2; i++) await renderUnifiedResult(task, {
+        title: 'gpt-image', flags: { output: 'json', download: true, outDir, quiet: true },
+      });
+      const files = readdirSync(outDir);
+      expect(files).toHaveLength(2);
+      for (const file of files) expect(readFileSync(join(outDir, file), 'utf-8')).toBe('image-bytes');
+    } finally { rmSync(outDir, { recursive: true, force: true }); }
+  });
+
+  test('summarizes inline image payloads in text output', async () => {
+    const b64 = Buffer.from('do-not-dump-image-payload').toString('base64');
+    const stdout = spyOn(process.stdout, 'write').mockReturnValue(true);
+    try {
+      await renderUnifiedResult(completedTask({ data: [{ b64_json: b64 }] }), {
+        title: 'gpt-image', flags: { output: 'text', quiet: true },
+      });
+      const text = stdout.mock.calls.map(([value]) => String(value)).join('');
+      expect(text).toContain('data[0].b64_json: <');
+      expect(text).not.toContain(b64);
+    } finally { stdout.mockRestore(); }
+  });
+
+  test('preserves raw async image provider failure details', async () => {
+    const task: TaskData = { task_id: 'image-failed', task_type: 'gpt-image-edit', status: 'failed',
+      output: { error_body: { error: { message: 'reference image rejected' } } } };
+    await expect(renderUnifiedResult(task, { title: 'gpt-image', flags: { output: 'json', quiet: true } }))
+      .rejects.toThrow('reference image rejected');
   });
 
   test('throws API_ERROR for cancelled task', async () => {

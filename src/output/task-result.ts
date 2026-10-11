@@ -7,7 +7,7 @@ import type { GlobalFlags } from '../types/flags';
 import { getFormatter } from './formatter';
 import { formatJSON } from './json';
 import { printRunSuccess } from './run-status';
-import { downloadUrl } from '../files/download';
+import { downloadUrl, saveBase64 } from '../files/download';
 import { CLIError } from '../errors/base';
 import { ExitCode } from '../errors/codes';
 
@@ -44,6 +44,27 @@ export async function maybeDownload(urls: string[], flags: GlobalFlags): Promise
   }
 }
 
+// OpenAI-shaped async outputs use output.data[].b64_json rather than URLs.
+function imagePayloads(output: TaskData['output']): { index: number; b64: string }[] {
+  if (!Array.isArray(output?.data)) return [];
+  return output.data.flatMap((item: unknown, index: number) => {
+    if (item === null || typeof item !== 'object') return [];
+    const b64 = (item as Record<string, unknown>).b64_json;
+    return typeof b64 === 'string' && b64.length > 0 ? [{ index, b64 }] : [];
+  });
+}
+
+function imageFailure(output: TaskData['output']): string | undefined {
+  const body = output?.error_body;
+  if (typeof body === 'string') return body;
+  if (body === null || typeof body !== 'object') return undefined;
+  const record = body as Record<string, unknown>;
+  const error = record.error;
+  const message = error && typeof error === 'object'
+    ? (error as Record<string, unknown>).message : record.message;
+  return typeof message === 'string' ? message : undefined;
+}
+
 export interface RenderTaskOpts {
   title: string;
   elapsedMs?: number;
@@ -66,7 +87,7 @@ export async function renderUnifiedResult(task: TaskData, opts: RenderTaskOpts):
     throw new CLIError(`Task ${task.task_id} was cancelled.`, ExitCode.API_ERROR);
   }
   if (task.status !== 'completed') {
-    const err = task.error?.message || task.error?.raw_message || 'unknown error';
+    const err = task.error?.message || task.error?.raw_message || imageFailure(task.output) || 'unknown error';
     throw new CLIError(`Task ${task.task_id} failed: ${err}`, ExitCode.API_ERROR);
   }
 
@@ -75,6 +96,7 @@ export async function renderUnifiedResult(task: TaskData, opts: RenderTaskOpts):
   // Walk the tree and print every http(s) URL with its key path; fall back to
   // raw JSON if no URLs found so the user still sees the result.
   const urls = extractUrls(out);
+  const images = imagePayloads(out);
 
   if (formatter !== 'json') {
     const usage = task.meta?.usage;
@@ -85,10 +107,24 @@ export async function renderUnifiedResult(task: TaskData, opts: RenderTaskOpts):
     });
     if (urls.length > 0) {
       for (const { label, url } of urls) process.stdout.write(`${label}: ${url}\n`);
+    } else if (images.length > 0) {
+      for (const { index, b64 } of images) {
+        process.stdout.write(`data[${index}].b64_json: <${Math.round(b64.length * 3 / 4 / 1024)} KB>\n`);
+      }
     } else if (out) {
       process.stdout.write(formatJSON(out) + '\n');
     }
   }
 
   await maybeDownload(urls.map((u) => u.url), flags);
+  if (flags.download) {
+    for (const { index, b64 } of images) {
+      try {
+        // Stable safe basename plus uniquePath prevents overwrites across waits.
+        await saveBase64(b64, `image-${index}.png`, { outDir: flags.outDir, quiet: flags.quiet });
+      } catch (e) {
+        process.stderr.write(`Save base64 failed (#${index}): ${e instanceof Error ? e.message : String(e)}\n`);
+      }
+    }
+  }
 }

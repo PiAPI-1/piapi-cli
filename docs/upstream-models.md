@@ -116,9 +116,10 @@ piapi run meshy-txt mode=refine preview_task_id=PREVIEW_TASK_ID --dry-run
   the only documented GA quality. This avoids a silent billing-route change.
 - Flare and Sunburst accept `auto`, `low`, `medium` and `high` quality. Suffix-free
   `gpt-image-2.5` only supports `n=1` and does not honor size/quality controls.
-- GPT image generation remains synchronous JSON generation. Multipart edits and
-  the separate async image submission endpoints are not implemented here.
-  Unified async base64 download support is also outside this update.
+- GPT image generation defaults to synchronous JSON. The follow-up image package
+  adds multipart edits, async image submission and async image base64 downloads.
+  See [GPT image workflows](image-workflows.md) for endpoint/auth boundaries,
+  local-file syntax and task retrieval.
 - Synchronous image requests default to 120s because documented Sunburst
   generation commonly takes 50-70s. Other API requests remain 30s and transfers
   60s. `PIAPI_TIMEOUT_MS` overrides fetch limits, not task polling. No automatic

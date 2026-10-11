@@ -19,7 +19,7 @@
 - **3D**: 6 catalog entries: `trellis`, `trellis2`, `pixal3d`, `meshy`, `meshy-txt`, `skin-tokens`
 - **LLM** — 12 个对话模型，包括 `gpt-4o`、`claude-sonnet-4.6`、`gpt-5`，以及 `gpt-image-2`（OpenAI 兼容图像生成）
 - **流式输出** — `--stream` 让 LLM 按 token 流式返回；SSE-only 模型（如 `sora2-preview`）默认流式
-- **File I/O**: `key=@./local.png` uploads local files. `--download` saves result URLs and synchronous GPT image generation `b64_json`.
+- **File I/O**: `key=@./local.png` uploads files for unified tasks. GPT `--edit` sends local references directly as multipart. `--download` saves image URLs and synchronous/async `b64_json`.
 - **双 API 接口** — 媒体生成走 Unified Task API，LLM 与 `gpt-image-2` 走 OpenAI 兼容接口。所有条目均与 PiAPI 文档核对；`piapi model list` displays the bundled catalog, not a live provider query.
 
 See [the October 11, 2026 update guide](docs/upstream-models.md) for all twenty new aliases, Seedance draft/edit/extend and Meshy workflows. Existing `gpt-image-2` still targets preview; use `gpt-image-2-ga` for GA. Midjourney support was removed following the official sunset.
@@ -103,7 +103,7 @@ piapi run remove-bg image=@./photo.png --download --out-dir ./out
 piapi run faceswap source=@./face.jpg target=@./scene.png --async
 ```
 
-Upload requires a paid plan. `--download` saves result URLs and synchronous GPT image generation base64 to `--out-dir`. Multipart GPT image editing is not implemented.
+Ephemeral uploads require a paid plan. GPT `--edit image=@file` sends local multipart files directly. Synchronous and async GPT image results support `--download`; see [GPT image workflows](docs/image-workflows.md).
 
 ### piapi task
 

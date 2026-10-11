@@ -19,10 +19,10 @@
 - **3D**: 6 entries including `trellis`, `trellis2`, `pixal3d`, `meshy`, `meshy-txt`, and `skin-tokens`
 - **LLM**: 12 chat entries including `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, and existing GPT, Claude and Gemini models
 - **Streaming** — `--stream` for token-by-token LLM output; SSE-only models (`sora2-preview`) stream by default
-- **File I/O**: `key=@./local.png` auto-uploads, `--download` saves result URLs and synchronous OpenAI image `b64_json` payloads
+- **File I/O**: `key=@./local.png` auto-uploads for unified tasks; GPT `--edit` sends local references directly as multipart. `--download` saves result URLs and synchronous or async image `b64_json` payloads
 - **Two API surfaces**: unified tasks for media and OpenAI-compatible endpoints for chat and GPT image generation. `piapi model list` shows the bundled, documentation-verified catalog, not a live provider query.
 
-See [the October 11, 2026 upstream update guide](docs/upstream-models.md) for new aliases, compatibility notes, workflow examples and known limitations.
+See [the October 11, 2026 upstream update guide](docs/upstream-models.md) for new aliases and compatibility notes, and [GPT image workflows](docs/image-workflows.md) for synchronous editing and async generation/editing.
 
 ## Install
 
@@ -77,7 +77,8 @@ piapi model list --type video
 
 Run any model with `key=value` inputs. Video and 3D unified models return
 an async task ID by default, without requiring `--async`.
-LLM and GPT image generation use synchronous OpenAI-compatible endpoints.
+LLM and GPT image generation use synchronous OpenAI-compatible endpoints by default.
+GPT image models also support `--edit` with local references and `--async` task submission.
 Other media models use unified tasks, while Sora preview models stream.
 
 ```bash
@@ -104,9 +105,10 @@ piapi run remove-bg image=@./photo.png --download --out-dir ./out
 piapi run faceswap source=@./face.jpg target=@./scene.png --async
 ```
 
-Upload requires a paid PiAPI plan. Add `--download` to save result URLs and
-synchronous GPT image generation base64 into `--out-dir` (default cwd).
-GPT multipart image editing is not implemented.
+Ephemeral upload requires a paid PiAPI plan. GPT `--edit image=@file` instead
+sends the file directly as multipart, without ephemeral upload. `--download`
+saves result URLs and GPT image base64, including `task wait` async results.
+See [image workflow examples and limits](docs/image-workflows.md).
 
 ### piapi task
 

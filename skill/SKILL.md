@@ -44,7 +44,7 @@ Run a model with `key=value` inputs. The CLI auto-routes to the right
 PiAPI surface:
 
 - **Unified task API**: most image, video, audio and 3D entries use async tasks.
-- **OpenAI-compatible image generation**: GPT image entries use synchronous JSON generations, not multipart editing.
+- **OpenAI-compatible image generation/editing**: GPT image entries use synchronous JSON generations by default. `--edit` sends local multipart references, and `--async` submits generation/edit tasks for `task wait`. See [GPT image workflows](../docs/image-workflows.md).
 - **OpenAI-compatible chat**: for LLMs, `prompt="…"` becomes a user message. `system="…"` prepends a system message; use `messages:='[{"role":"user","content":"hello"}]'` for explicit messages. `@file` uploads media rather than reading JSON messages.
 
 ```bash
@@ -82,7 +82,8 @@ stdout still shows the URL lines for grepping.
 
 | Flag | Description |
 |---|---|
-| `--async` | Return task ID immediately (default for unified video/3D models) |
+| `--edit` | GPT images only: multipart editing with image=@file or an ordered JSON array of @files |
+| `--async` | Return a task ID without polling; GPT images use the separate async image gateway |
 | `--stream` | Stream LLM output as it arrives (openai-completions only) |
 | `--dry-run` | Print request body without sending |
 | `--webhook <url>` | Webhook for unified-API completion callbacks |

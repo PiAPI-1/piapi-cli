@@ -4,7 +4,8 @@ export interface TaskResponse {
   data: TaskData;
 }
 
-export type TaskStatus = 'pending' | 'staged' | 'processing' | 'running' | 'completed' | 'failed' | 'cancelled';
+export const TASK_STATUSES = ['pending', 'staged', 'processing', 'running', 'completed', 'failed', 'cancelled'] as const;
+export type TaskStatus = typeof TASK_STATUSES[number];
 
 // A task in any of these states will not change further. Centralised so the
 // polling loop and any future status renderer share one source of truth.

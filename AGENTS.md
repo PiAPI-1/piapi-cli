@@ -131,11 +131,13 @@ const apiKey = resolveAPIKey(flags.apiKey) ?? config.apiKey;
 
 The October 11, 2026 update, compatibility boundaries, upstream contradictions and regression-test pointers are documented in `docs/upstream-models.md`. `defaultInput` controls request input defaults, while `defaultConfig` controls unified task configuration and is merged with webhook options.
 
+GPT `--edit` skips ephemeral upload and sends local references as multipart. GPT `--async` uses the image-specific task gateway, but existing `task get`/`task wait` query the same task endpoint. Multipart validation, authentication boundaries, async base64 decoding and recurrence tests are documented in `docs/image-workflows.md`.
+
 ## 已知坑（修过的别再踩）
 
 - **VERSION 不要硬编码**，必须 `process.env.CLI_VERSION ?? '0.0.0-dev'`，由 `build.ts` define 注入
 - **`registry.printRoot` 不要硬编码 flag 列表**，从 `GLOBAL_OPTIONS` 迭代渲染
-- **`models/schema.ts` 只覆盖 26/111 条目**，`model schema <X>` 错误消息要区分"unknown model"和"no schema defined"
+- **`models/schema.ts` 只覆盖 29/111 条目**，`model schema <X>` 错误消息要区分"unknown model"和"no schema defined"
 - **流式 chat 的 `usage` 可能是 `{}`**，必须 `typeof usage?.total_tokens === 'number'` 才打印
 - **`status-bar.ts` 模块级 `printed` 是设计意图**（一次启动只打一次 banner），别"修复"
 - **npm publish 失败时，`E404` 和 `E403` 是两回事**（v0.3.0 踩过）。对已存在的包 PUT：

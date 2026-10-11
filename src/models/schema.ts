@@ -106,10 +106,12 @@ export function getModelSchema(modelName: string): Record<string, unknown> | nul
     seed: { type: 'number', default: -1, description: '-1 selects a random seed' },
   };
 
-  // Generation-only: multipart edits and the separate async image API are not implemented.
+  // --edit selects multipart inputs; --async selects the task submission gateway.
   // docs: https://piapi.ai/docs/gpt-image/gpt-image-api.md
   const image = {
     prompt: { type: 'string', required: true },
+    image: { type: 'string or array', description: '--edit only: image=@file or image:=["@file1","@file2"], 1-16 local PNG/JPG/WEBP files, at most 25 MB each' },
+    mask: { type: 'string', description: '--edit only: optional local mask=@file, applies to the first image' },
     size: { type: 'string', default: '1024x1024' },
     n: { type: 'number', default: 1 },
     response_format: { type: 'string', default: 'b64_json', description: 'b64_json or url; --download saves either response type' },
@@ -140,5 +142,6 @@ export function getModelSchema(modelName: string): Record<string, unknown> | nul
   };
   for (const name of ['gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-6-astra']) schemas[name] = chat;
 
+  if (model.apiType === 'openai-images' && !schemas[model.name]) schemas[model.name] = image;
   return schemas[model.name] ?? null;
 }
