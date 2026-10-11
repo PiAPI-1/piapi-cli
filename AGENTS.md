@@ -1,6 +1,6 @@
 # piapi-cli — Repo Guide
 
-PiAPI 官方 CLI。101 个多模态模型聚合（image/video/audio/3D/LLM）。Bootstrap SaaS 项目，发布到 npm `piapi-cli`。
+PiAPI 官方 CLI。111 个多模态模型聚合（image/video/audio/3D/LLM）。Bootstrap SaaS 项目，发布到 npm `piapi-cli`。
 
 > 本文件是**唯一事实源**。`CLAUDE.md` 是指向它的 symlink（Claude Code 只读 `CLAUDE.md`，Codex 只读 `AGENTS.md`）。别把两者拆成两份内容——那会让异构互审失效。
 
@@ -16,7 +16,7 @@ bun test          # 0 fail，CI gate（数量会涨，别在这硬编码）
 ## 不动的硬约束
 
 - **Brand 颜色只允许 pure blue**。禁紫/粉/青/teal — 这些是通用 AI 工具默认色，要避开。看到这些立刻替换成 `ANSI.blue` 或 `bold + dim`。
-- **101 个 catalog 条目都已对照 PiAPI 文档校验**。每条带 `// docs:` 链接 + `verified: true`。新增模型必须先验证文档才能加。
+- **111 个 catalog 条目都已对照 PiAPI 文档校验**。每条带 `// docs:` 链接 + `verified: true`。新增模型必须先验证文档才能加。
 - **Skip PiAPI 文档标"deprecated"或"service stopped"的接口**（如 Suno）。
 - **对话中文，代码/commit/PR/注释英文**。
 
@@ -117,7 +117,7 @@ const apiKey = resolveAPIKey(flags.apiKey) ?? config.apiKey;
 - 配置：CLI flag → `PIAPI_API_KEY` env → `~/.piapi/config.json` → 默认。优先级在 `src/auth/resolver.ts`
 - `auth status` 等命令必须用已解析的 `config.apiKey`，**不要**重读文件（否则 `--api-key` 不生效）
 - 配置解析失败时打 stderr 一次警告 + 降级 `{}`（不静默吞）：`src/config/loader.ts`
-- 所有 fetch 走 `AbortSignal.timeout()`：API 30s / 上传下载 60s / 流式不超时。`PIAPI_TIMEOUT_MS` 覆盖。`src/client/timeout.ts`
+- 所有 fetch 走 `AbortSignal.timeout()`：synchronous images 120s / other API 30s / 上传下载 60s / 流式不超时。`PIAPI_TIMEOUT_MS` 覆盖。`src/client/timeout.ts`
 
 ## 发布前检查
 
@@ -127,11 +127,15 @@ const apiKey = resolveAPIKey(flags.apiKey) ?? config.apiKey;
 4. tag `v*` 触发 `.github/workflows/release.yml` → npm publish 先跑，成功后才建 GH Release（需要 repo `NPM_TOKEN` secret）
 5. 推 tag 后**必须**核 `npm view piapi-cli version`。workflow 绿 ≠ 发布成功，见「已知坑」
 
+## Upstream contract evidence
+
+The October 11, 2026 update, compatibility boundaries, upstream contradictions and regression-test pointers are documented in `docs/upstream-models.md`. `defaultInput` controls request input defaults, while `defaultConfig` controls unified task configuration and is merged with webhook options.
+
 ## 已知坑（修过的别再踩）
 
 - **VERSION 不要硬编码**，必须 `process.env.CLI_VERSION ?? '0.0.0-dev'`，由 `build.ts` define 注入
 - **`registry.printRoot` 不要硬编码 flag 列表**，从 `GLOBAL_OPTIONS` 迭代渲染
-- **`models/schema.ts` 只覆盖 7/101 条目**，`model schema <X>` 错误消息要区分"unknown model"和"no schema defined"
+- **`models/schema.ts` 只覆盖 26/111 条目**，`model schema <X>` 错误消息要区分"unknown model"和"no schema defined"
 - **流式 chat 的 `usage` 可能是 `{}`**，必须 `typeof usage?.total_tokens === 'number'` 才打印
 - **`status-bar.ts` 模块级 `printed` 是设计意图**（一次启动只打一次 banner），别"修复"
 - **npm publish 失败时，`E404` 和 `E403` 是两回事**（v0.3.0 踩过）。对已存在的包 PUT：

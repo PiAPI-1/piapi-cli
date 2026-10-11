@@ -12,6 +12,7 @@
 //   etc — each entry carries its docs URL inline.
 
 import { closest } from '../suggest';
+import type { CreateTaskRequest } from '../types/api';
 
 export type ModelType = 'image' | 'video' | 'audio' | '3d' | 'llm';
 
@@ -33,6 +34,7 @@ export interface ModelEntry {
   asyncOnly?: boolean;
   streamingOnly?: boolean;  // openai-completions only — force stream=true (sora2-preview)
   defaultInput?: Record<string, unknown>;  // merged into request input/body (user values win)
+  defaultConfig?: CreateTaskRequest['config'];  // unified task config, merged with --webhook
   verified?: boolean;    // true = real `model` string verified against piapi docs
 }
 
@@ -54,29 +56,6 @@ export const MODELS: ModelEntry[] = [
   { name: 'flux-outpaint', type: 'image', model: 'Qubico/flux1-dev-advanced', taskType: 'fill-outpaint', provider: 'Flux', verified: true },
   // docs: https://piapi.ai/docs/flux-redux-fill-variation-inpaint-outpaint.md
   { name: 'flux-redux', type: 'image', model: 'Qubico/flux1-dev-advanced', taskType: 'redux-variation', provider: 'Flux', verified: true },
-
-  // docs: https://piapi.ai/docs/midjourney-api/imagine.md
-  { name: 'midjourney', type: 'image', model: 'midjourney', taskType: 'imagine', provider: 'Midjourney', verified: true },
-
-  // ========== midjourney variants ==========
-  // docs: https://piapi.ai/docs/midjourney-api/upscale.md
-  { name: 'mj-upscale', type: 'image', model: 'midjourney', taskType: 'upscale', provider: 'Midjourney', asyncOnly: true, verified: true },
-  // docs: https://piapi.ai/docs/midjourney-api/variation.md
-  { name: 'mj-variation', type: 'image', model: 'midjourney', taskType: 'variation', provider: 'Midjourney', asyncOnly: true, verified: true },
-  // docs: https://piapi.ai/docs/midjourney-api/reroll.md
-  { name: 'mj-reroll', type: 'image', model: 'midjourney', taskType: 'reroll', provider: 'Midjourney', asyncOnly: true, verified: true },
-  // docs: https://piapi.ai/docs/midjourney-api/describe.md
-  { name: 'mj-describe', type: 'image', model: 'midjourney', taskType: 'describe', provider: 'Midjourney', asyncOnly: true, verified: true },
-  // docs: https://piapi.ai/docs/midjourney-api/seed.md
-  { name: 'mj-seed', type: 'image', model: 'midjourney', taskType: 'seed', provider: 'Midjourney', asyncOnly: true, verified: true },
-  // docs: https://piapi.ai/docs/midjourney-api/blend.md
-  { name: 'mj-blend', type: 'image', model: 'midjourney', taskType: 'blend', provider: 'Midjourney', asyncOnly: true, verified: true },
-  // docs: https://piapi.ai/docs/midjourney-api/inpaint.md
-  { name: 'mj-inpaint', type: 'image', model: 'midjourney', taskType: 'inpaint', provider: 'Midjourney', asyncOnly: true, verified: true },
-  // docs: https://piapi.ai/docs/midjourney-api/outpaint.md
-  { name: 'mj-outpaint', type: 'image', model: 'midjourney', taskType: 'outpaint', provider: 'Midjourney', asyncOnly: true, verified: true },
-  // docs: https://piapi.ai/docs/midjourney-api/pan.md
-  { name: 'mj-pan', type: 'image', model: 'midjourney', taskType: 'pan', provider: 'Midjourney', asyncOnly: true, verified: true },
 
   // docs: https://piapi.ai/docs/gemini-api/nano-banana-pro.md
   { name: 'nano-banana-pro', type: 'image', model: 'gemini', taskType: 'nano-banana-pro', provider: 'Gemini', verified: true },
@@ -165,6 +144,16 @@ export const MODELS: ModelEntry[] = [
   // docs: https://piapi.ai/docs/hailuo-api/generate-video.md
   { name: 'hailuo', type: 'video', model: 'hailuo', taskType: 'video_generation', provider: 'Hailuo', asyncOnly: true, defaultInput: { model: 'v2.3' }, verified: true },
 
+  // Resolution prose and schema disagree. Do not inject a resolution default.
+  // docs: https://piapi.ai/docs/minimax-api/generate-video.md
+  { name: 'minimax-h3', type: 'video', model: 'Qubico/minimax-h3', taskType: 'txt2video', provider: 'MiniMax', asyncOnly: true, defaultConfig: { service_mode: 'public' }, verified: true },
+  // docs: https://piapi.ai/docs/minimax-api/generate-video.md
+  { name: 'minimax-h3-img2vid', type: 'video', model: 'Qubico/minimax-h3', taskType: 'img2video', provider: 'MiniMax', asyncOnly: true, defaultConfig: { service_mode: 'public' }, verified: true },
+  // docs: https://piapi.ai/docs/minimax-api/generate-video.md
+  { name: 'minimax-h3-nsfw', type: 'video', model: 'Qubico/minimax-h3-nsfw', taskType: 'txt2video', provider: 'MiniMax', asyncOnly: true, defaultConfig: { service_mode: 'public' }, verified: true },
+  // docs: https://piapi.ai/docs/minimax-api/generate-video.md
+  { name: 'minimax-h3-nsfw-img2vid', type: 'video', model: 'Qubico/minimax-h3-nsfw', taskType: 'img2video', provider: 'MiniMax', asyncOnly: true, defaultConfig: { service_mode: 'public' }, verified: true },
+
   // docs: https://piapi.ai/docs/skyreels-api/create-task.md
   { name: 'skyreels', type: 'video', model: 'Qubico/skyreels', taskType: 'img2video', provider: 'Skyreels', asyncOnly: true, verified: true },
   // docs: https://piapi.ai/docs/framepack-api/create-task.md
@@ -208,6 +197,15 @@ export const MODELS: ModelEntry[] = [
   // docs: https://piapi.ai/docs/seedance-api/less-restriction.md
   { name: 'seedance-2-less-restriction', type: 'video', model: 'seedance', taskType: 'seedance-2-less-restriction', provider: 'Seedance', asyncOnly: true, verified: true },
   { name: 'seedance-2-fast-less-restriction', type: 'video', model: 'seedance', taskType: 'seedance-2-fast-less-restriction', provider: 'Seedance', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/seedance-api/seedance-2.md
+  { name: 'seedance-2-mini', type: 'video', model: 'seedance', taskType: 'seedance-2-mini', provider: 'Seedance', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/seedance-api/seedance-2.md
+  { name: 'seedance-2-mini-less-restriction', type: 'video', model: 'seedance', taskType: 'seedance-2-mini-less-restriction', provider: 'Seedance', asyncOnly: true, verified: true },
+  // No prompt/default references here: draft finalization reuses its draft inputs.
+  // docs: https://piapi.ai/docs/seedance-api/seedance-25.md
+  { name: 'seedance-2.5', type: 'video', model: 'seedance', taskType: 'seedance-2.5', provider: 'Seedance', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/seedance-api/seedance-25.md
+  { name: 'seedance-2.5-less-restriction', type: 'video', model: 'seedance', taskType: 'seedance-2.5-less-restriction', provider: 'Seedance', asyncOnly: true, verified: true },
   // docs: https://piapi.ai/docs/seedance-api/video-watermark-remover.md
   { name: 'seedance-watermark', type: 'video', model: 'seedance', taskType: 'remove-watermark', provider: 'Seedance', asyncOnly: true, verified: true },
 
@@ -250,10 +248,29 @@ export const MODELS: ModelEntry[] = [
   { name: 'trellis2', type: '3d', model: 'Qubico/trellis2', taskType: 'image-to-3d', provider: 'Trellis', asyncOnly: true, verified: true },
   // docs: https://piapi.ai/docs/pixal-3d-api/create-task.md
   { name: 'pixal3d', type: '3d', model: 'Qubico/pixal3d', taskType: 'image-to-3d', provider: 'Pixal3D', asyncOnly: true, verified: true },
+  // docs: https://piapi.ai/docs/meshy-api/create-task.md
+  { name: 'meshy', type: '3d', model: 'meshy', taskType: 'image-to-3d', provider: 'Meshy', asyncOnly: true, defaultConfig: { service_mode: 'public' }, verified: true },
+  // docs: https://piapi.ai/docs/meshy-api/create-task.md
+  { name: 'meshy-txt', type: '3d', model: 'meshy', taskType: 'text-to-3d', provider: 'Meshy', asyncOnly: true, defaultConfig: { service_mode: 'public' }, verified: true },
+  // docs: https://piapi.ai/docs/tools/skin-tokens-api.md
+  { name: 'skin-tokens', type: '3d', model: 'Qubico/skin-tokens', taskType: 'rig', provider: 'SkinTokens', asyncOnly: true, verified: true },
 
   // ========== OpenAI-compat: GPT image ==========
+  // Compatibility alias: keep preview's flat-rate behavior, never silently switch to GA.
   // docs: https://piapi.ai/docs/gpt-image/gpt-image-api.md
   { name: 'gpt-image-2', type: 'image', model: 'gpt-image-2-preview', provider: 'OpenAI', apiType: 'openai-images', verified: true },
+  // docs: https://piapi.ai/docs/gpt-image/gpt-image-api.md
+  { name: 'gpt-image-2-preview', type: 'image', model: 'gpt-image-2-preview', provider: 'OpenAI', apiType: 'openai-images', verified: true },
+  // GA is token-billed and only supports medium quality.
+  // docs: https://piapi.ai/docs/gpt-image/gpt-image-api.md
+  { name: 'gpt-image-2-ga', type: 'image', model: 'gpt-image-2', provider: 'OpenAI', apiType: 'openai-images', defaultInput: { quality: 'medium' }, verified: true },
+  // The budget route accepts but does not honor size/quality; only n=1 is supported.
+  // docs: https://piapi.ai/docs/gpt-image/gpt-image-api.md
+  { name: 'gpt-image-2.5', type: 'image', model: 'gpt-image-2.5', provider: 'OpenAI', apiType: 'openai-images', verified: true },
+  // docs: https://piapi.ai/docs/gpt-image/gpt-image-api.md
+  { name: 'gpt-image-2.5-flare', type: 'image', model: 'gpt-image-2.5-flare', provider: 'OpenAI', apiType: 'openai-images', verified: true },
+  // docs: https://piapi.ai/docs/gpt-image/gpt-image-api.md
+  { name: 'gpt-image-2.5-sunburst', type: 'image', model: 'gpt-image-2.5-sunburst', provider: 'OpenAI', apiType: 'openai-images', verified: true },
   { name: 'gpt-image-1.5', type: 'image', model: 'gpt-image-1.5', provider: 'OpenAI', apiType: 'openai-images', verified: true },
   { name: 'gpt-image-1', type: 'image', model: 'gpt-image-1', provider: 'OpenAI', apiType: 'openai-images', verified: true },
 
@@ -261,6 +278,14 @@ export const MODELS: ModelEntry[] = [
   // docs: https://piapi.ai/docs/llm-api/completions.md
   { name: 'gpt-5', type: 'llm', model: 'gpt-5', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
   { name: 'gpt-5.2', type: 'llm', model: 'gpt-5.2', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
+  // docs: https://piapi.ai/docs/llm-api/completions.md
+  { name: 'gpt-5.6-sol', type: 'llm', model: 'gpt-5.6-sol', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
+  // docs: https://piapi.ai/docs/llm-api/completions.md
+  { name: 'gpt-5.6-terra', type: 'llm', model: 'gpt-5.6-terra', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
+  // docs: https://piapi.ai/docs/llm-api/completions.md
+  { name: 'gpt-5.6-luna', type: 'llm', model: 'gpt-5.6-luna', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
+  // docs: https://piapi.ai/docs/llm-api/completions.md
+  { name: 'gpt-6-astra', type: 'llm', model: 'gpt-6-astra', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
   { name: 'gpt-4o', type: 'llm', model: 'gpt-4o', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
   { name: 'gpt-4o-mini', type: 'llm', model: 'gpt-4o-mini', provider: 'OpenAI', apiType: 'openai-completions', verified: true },
   { name: 'gpt-4.1', type: 'llm', model: 'gpt-4.1', provider: 'OpenAI', apiType: 'openai-completions', verified: true },

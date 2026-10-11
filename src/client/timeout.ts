@@ -6,6 +6,9 @@
 
 export const DEFAULT_API_TIMEOUT_MS = 30_000;
 export const DEFAULT_TRANSFER_TIMEOUT_MS = 60_000;
+// Synchronous GPT-image generations typically take 50-70s server-side
+// (PiAPI docs: gpt-image-api), so 30s would false-positive on healthy runs.
+export const DEFAULT_IMAGE_TIMEOUT_MS = 120_000;
 
 function envOverride(): number | undefined {
   const v = process.env.PIAPI_TIMEOUT_MS;

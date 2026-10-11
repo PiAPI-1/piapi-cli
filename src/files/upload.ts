@@ -41,6 +41,29 @@ export async function uploadFile(apiKey: string, filePath: string): Promise<Uplo
     throw new Error(`Upload failed (${res.status} ${res.statusText}): ${msg || '(no body)'}`);
   }
 
-  const data = await res.json() as { url: string };
-  return { url: data.url, filename };
+  const body: unknown = await res.json();
+  return { url: extractUploadUrl(body, filename), filename };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function extractUploadUrl(body: unknown, filename: string): string {
+  if (!isRecord(body)) {
+    throw new Error(`Upload response for ${filename} is not a JSON object`);
+  }
+
+  // Error envelopes can arrive with HTTP 200 (e.g. {code:403,message:"Insufficient plan level"}).
+  if (typeof body.code === 'number' && body.code !== 200) {
+    const message = typeof body.message === 'string' && body.message ? body.message : `code ${body.code}`;
+    throw new Error(`Upload failed for ${filename}: ${message}`);
+  }
+
+  const data = isRecord(body.data) ? body.data : undefined;
+  const url = data?.url ?? body.url;
+  if (typeof url !== 'string' || url === '') {
+    throw new Error(`Upload response for ${filename} is missing a valid url`);
+  }
+  return url;
 }

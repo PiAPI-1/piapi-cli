@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>piapi — 一个二进制，97 个多模态 AI 模型</strong><br>
+  <strong>piapi — 一个二进制，111 个多模态 AI 模型</strong><br>
   在终端或 AI Agent 中生成图像、视频、音频、3D，以及与 LLM 对话。
 </p>
 
@@ -13,14 +13,16 @@
 
 ## 能力概览
 
-- **图像** — 35 个模型，包括 `flux-dev`、`nano-banana-pro`、`qwen-image-edit`、`seedream-5-lite`、`midjourney`，以及工具类（`remove-bg`、`upscale`、`segment`、`joycaption`、`faceswap`）
-- **视频** — 42 个模型，包括 `sora2-pro`、`kling-3`、`veo3-fast`、`wanx22`、`seedance-2`、`hailuo`、`luma`
-- **音频** — 10 个模型，包括 `mmaudio`（视频转音频）、`f5-tts`、`diffrhythm`、`udio-music`、`ace-step`
-- **3D** — `trellis`（文本转 3D）、`trellis2`（图片转 3D）
-- **LLM** — 8 个对话模型，包括 `gpt-4o`、`claude-sonnet-4.6`、`gpt-5`，以及 `gpt-image-2`（OpenAI 兼容图像生成）
+- **图像** — 32 个模型，包括 `flux-dev`、`nano-banana-pro`、`qwen-image-edit`、`seedream-5-lite`、`gpt-image-2.5-sunburst`，以及工具类（`remove-bg`、`upscale`、`segment`、`joycaption`、`faceswap`）
+- **视频** — 50 个模型，包括 `sora2-pro`、`kling-3`、`veo3-fast`、`wanx22`、`seedance-2`、`hailuo`、`luma`
+- **音频** — 11 个模型，包括 `mmaudio`（视频转音频）、`f5-tts`、`diffrhythm`、`udio-music`、`ace-step`
+- **3D**: 6 catalog entries: `trellis`, `trellis2`, `pixal3d`, `meshy`, `meshy-txt`, `skin-tokens`
+- **LLM** — 12 个对话模型，包括 `gpt-4o`、`claude-sonnet-4.6`、`gpt-5`，以及 `gpt-image-2`（OpenAI 兼容图像生成）
 - **流式输出** — `--stream` 让 LLM 按 token 流式返回；SSE-only 模型（如 `sora2-preview`）默认流式
-- **文件 I/O** — `key=@./local.png` 自动上传本地文件；`--download` 自动保存所有 URL 或 `b64_json` 输出
-- **双 API 接口** — 媒体生成走 Unified Task API，LLM 与 `gpt-image-2` 走 OpenAI 兼容接口。所有条目均与 PiAPI 文档核对；`piapi model list` 查看实时目录。
+- **File I/O**: `key=@./local.png` uploads local files. `--download` saves result URLs and synchronous GPT image generation `b64_json`.
+- **双 API 接口** — 媒体生成走 Unified Task API，LLM 与 `gpt-image-2` 走 OpenAI 兼容接口。所有条目均与 PiAPI 文档核对；`piapi model list` displays the bundled catalog, not a live provider query.
+
+See [the October 11, 2026 update guide](docs/upstream-models.md) for all twenty new aliases, Seedance draft/edit/extend and Meshy workflows. Existing `gpt-image-2` still targets preview; use `gpt-image-2-ga` for GA. Midjourney support was removed following the official sunset.
 
 ## 安装
 
@@ -73,7 +75,7 @@ piapi model list --type video
 
 ### piapi run \<model\> key=value...
 
-使用 `key=value` 输入运行任意模型。视频和 3D 模型需要 `--async`。
+Use `key=value` inputs. Unified video and 3D models return task IDs by default; `--async` is optional.
 LLM 与 `gpt-image-2` 走 OpenAI 兼容接口（同步，无需轮询），其他模型走
 Unified Task API。
 
@@ -101,8 +103,7 @@ piapi run remove-bg image=@./photo.png --download --out-dir ./out
 piapi run faceswap source=@./face.jpg target=@./scene.png --async
 ```
 
-文件上传需要 PiAPI 付费套餐。加 `--download` 自动把所有 URL（以及
-`gpt-image-2` 参考图编辑返回的 base64）保存到 `--out-dir`（默认当前目录）。
+Upload requires a paid plan. `--download` saves result URLs and synchronous GPT image generation base64 to `--out-dir`. Multipart GPT image editing is not implemented.
 
 ### piapi task
 
@@ -110,7 +111,7 @@ piapi run faceswap source=@./face.jpg target=@./scene.png --async
 piapi task list
 piapi task get <id>
 piapi task wait <id> --download   # 轮询直到完成，输出与同步 run 一致
-piapi task cancel <id>   # 仅部分提供方支持（Kling/Midjourney）；v1 会返回提示
+piapi task cancel <id>   # 仅部分提供方支持（Kling）；v1 会返回提示
 ```
 
 ### piapi model
@@ -179,7 +180,7 @@ piapi quota
 |---|---|
 | `PIAPI_API_KEY` | API 密钥 |
 | `PIAPI_BASE_URL` | 覆盖 API 基础 URL |
-| `PIAPI_TIMEOUT_MS` | 覆盖请求超时（默认 API 30s / 上传下载 60s） |
+| `PIAPI_TIMEOUT_MS` | 覆盖请求超时（默认 synchronous images 120s / other API 30s / 上传下载 60s） |
 | `PIAPI_NO_UPDATE_CHECK` | 关闭每日 npm 版本检查 |
 | `NO_COLOR` | 关闭 ANSI 颜色（任意非空值） |
 

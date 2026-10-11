@@ -228,11 +228,19 @@ async function runUnified(
   if (!model.taskType) {
     throw new CLIError(`Model ${model.name} has no taskType (catalog bug).`, ExitCode.INTERNAL);
   }
+  const config = model.defaultConfig !== undefined || flags.webhook
+    ? {
+      ...model.defaultConfig,
+      ...(flags.webhook ? {
+        webhook_config: { ...model.defaultConfig?.webhook_config, endpoint: flags.webhook },
+      } : {}),
+    }
+    : undefined;
   const req: CreateTaskRequest = {
     model: model.model,
     task_type: model.taskType,
     input,
-    ...(flags.webhook ? { config: { webhook_config: { endpoint: flags.webhook } } } : {}),
+    ...(config !== undefined ? { config } : {}),
   };
 
   if (flags.dryRun) {
@@ -305,7 +313,7 @@ export default defineCommand({
     'piapi run sora2-pro prompt="a sunset" --async',
     'piapi run flux-dev prompt="test" --dry-run',
     'piapi run kling-3 prompt="…" version==3.0          # == forces a literal string',
-    'piapi run mj-blend image_urls:=\'["https://a.png","https://b.png"]\'  # := strict JSON',
+    'piapi run seedance-2.5 image_urls:=\'["https://a.png"]\' prompt="animate" --dry-run',
   ],
   async execute(config, flags: GlobalFlags) {
     const modelName = flags._positional?.[0];

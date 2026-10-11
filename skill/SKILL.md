@@ -1,11 +1,11 @@
 ---
 name: piapi-cli
-description: Use piapi to call 97 multimodal AI models — image (flux/midjourney/qwen/nano-banana/seedream/z-image/gpt-image), video (sora2/veo3/kling/hailuo/wan/seedance/skyreels/framepack/hunyuan/luma/omni-human/ai-hug), audio (udio/ace-step/mmaudio/diffrhythm/f5-tts), 3D (trellis), LLM (gpt/claude/gemini) — from the terminal. Auto-routes between PiAPI's unified task API and OpenAI-compatible endpoints. Supports key=value inputs, async tasks, polling, and webhook callbacks.
+description: Use piapi to call 111 multimodal AI catalog entries from the terminal, including image (flux/qwen/nano-banana/seedream/z-image/gpt-image), video (sora2/veo3/kling/hailuo/minimax-h3/wan/seedance/skyreels/framepack/hunyuan/luma/omni-human/ai-hug), audio (udio/ace-step/mmaudio/seed-audio/diffrhythm/f5-tts), 3D (trellis/pixal3d/meshy/skin-tokens), and LLM (gpt/claude/gemini). Auto-routes between PiAPI's unified task API and OpenAI-compatible endpoints. Supports key=value inputs, async tasks, polling, and webhook callbacks.
 ---
 
 # PiAPI CLI — Agent Skill Guide
 
-Use `piapi` to call 97 multimodal AI models via the PiAPI unified API.
+Use `piapi` to call 111 multimodal AI catalog entries via PiAPI's unified task and OpenAI-compatible APIs.
 
 ## Prerequisites
 
@@ -43,12 +43,9 @@ piapi auth status
 Run a model with `key=value` inputs. The CLI auto-routes to the right
 PiAPI surface:
 
-- **Unified task API** (async lifecycle, polled): all image/video/audio/3D
-  models below.
-- **OpenAI-compatible** (sync, returns immediately): GPT-image and LLM
-  models. `prompt="…"` becomes `messages: [{role:'user', content}]`.
-  Optional `system="…"` prepends a system message; `messages=@file.json`
-  overrides for fine control.
+- **Unified task API**: most image, video, audio and 3D entries use async tasks.
+- **OpenAI-compatible image generation**: GPT image entries use synchronous JSON generations, not multipart editing.
+- **OpenAI-compatible chat**: for LLMs, `prompt="…"` becomes a user message. `system="…"` prepends a system message; use `messages:='[{"role":"user","content":"hello"}]'` for explicit messages. `@file` uploads media rather than reading JSON messages.
 
 ```bash
 piapi run flux-dev prompt="a corgi" aspect_ratio=16:9 num_outputs=4
@@ -85,25 +82,24 @@ stdout still shows the URL lines for grepping.
 
 | Flag | Description |
 |---|---|
-| `--async` | Return task ID immediately (required for video/3D unified models) |
+| `--async` | Return task ID immediately (default for unified video/3D models) |
 | `--stream` | Stream LLM output as it arrives (openai-completions only) |
 | `--dry-run` | Print request body without sending |
 | `--webhook <url>` | Webhook for unified-API completion callbacks |
 | `--out-dir <path>` | Download outputs to directory (default: cwd) |
 | `--download` | Save every result URL to disk after the task completes |
 
-**Models** (97 entries, every one verified against PiAPI docs).
-For the full live list, run `piapi model list` — the catalog is the
-source of truth. Highlights below:
+**Catalog**: 111 entries, including aliases and task variants, verified against official documentation rather than paid live generation.
+Run `piapi model list` for the full bundled list. See [the upstream update guide](../docs/upstream-models.md) for the October 11, 2026 contracts and limitations. Highlights below:
 
 - **Image generation** (unified): `flux-dev`, `flux-schnell`,
   `flux-dev-advanced`, `flux-img2img`, `flux-kontext`, `flux-inpaint`,
-  `flux-outpaint`, `flux-redux`, `midjourney`, `mj-{upscale,variation,reroll,describe,seed,blend,inpaint,outpaint,pan}`,
+  `flux-outpaint`, `flux-redux`,
   `nano-banana-pro`, `nano-banana-2`, `gemini-2.5-flash-image`,
   `qwen-image`, `qwen-image-edit`, `z-image`, `seedream-5-lite`,
-  `seedream-5-lite-less-restriction`
+  `seedream-5-lite-less-restriction`, `seedream-5-pro`, `seedream-5-pro-less-restriction`
 - **Image tools** (unified): `remove-bg`, `upscale`, `segment`, `joycaption`, `faceswap`, `multi-faceswap`
-- **Image generation** (OpenAI-compat): `gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`
+- **Image generation** (OpenAI-compat): `gpt-image-2` (legacy preview), `gpt-image-2-preview`, `gpt-image-2-ga`, `gpt-image-2.5`, `gpt-image-2.5-flare`, `gpt-image-2.5-sunburst`, `gpt-image-1.5`, `gpt-image-1`
 - **Video** (all async unified): `sora2`, `sora2-pro`, `sora2-watermark`,
   `veo3`, `veo3-fast`, `veo3.1`, `veo3.1-fast`,
   `kling-3`, `kling-3-omni`, `kling-o1`, `kling-tryon`, `kling-effects`,
@@ -113,23 +109,26 @@ source of truth. Highlights below:
   `wan2.6`, `wan2.6-img2vid`, `wanx-lora`, `wanx-lora-img2vid`,
   `wanx-keyframe`, `wanx-camera`, `wanx22`, `wanx22-img2vid`,
   `seedance-2`, `seedance-2-fast`, `seedance-2-less-restriction`,
-  `seedance-2-fast-less-restriction`, `seedance-watermark`
+  `seedance-2-fast-less-restriction`, `seedance-watermark`,
+  `seedance-2.5`, `seedance-2.5-less-restriction`, `seedance-2-mini`,
+  `seedance-2-mini-less-restriction`, `minimax-h3`, `minimax-h3-img2vid`,
+  `minimax-h3-nsfw`, `minimax-h3-nsfw-img2vid`
 - **Video tools** (async unified): `video-upscale`, `video-remove-bg`, `video-faceswap`
 - **Video** (OpenAI-compat streaming): `sora2-preview`, `sora2-hd-preview` — emits markdown progress + final video URL via SSE; the CLI streams chunks to stdout and prints `url: …` lines at the end
 - **Audio** (unified): `udio-music`, `udio-song-extend`, `udio-lyrics`,
   `ace-step`, `ace-step-audio2audio`, `ace-step-edit`, `ace-step-extend`,
-  `mmaudio`, `diffrhythm`, `f5-tts`
-- **3D** (async unified): `trellis`, `trellis2`
-- **LLM** (OpenAI-compat): `gpt-5`, `gpt-5.2`, `gpt-4o`, `gpt-4o-mini`,
+  `mmaudio`, `seed-audio`, `diffrhythm`, `f5-tts`
+- **3D** (async unified): `trellis`, `trellis2`, `pixal3d`, `meshy`, `meshy-txt`, `skin-tokens`
+- **LLM** (OpenAI-compat): `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, `gpt-5`, `gpt-5.2`, `gpt-4o`, `gpt-4o-mini`,
   `gpt-4.1`, `claude-opus-4.6`, `claude-sonnet-4.6`, `gemini-2.5-flash-nothinking`
 
-**Less-restriction variants** (`seedance-2-less-restriction`,
-`seedance-2-fast-less-restriction`, `seedream-5-lite-less-restriction`):
-same engine and input schema as the strict models, more permissive content
-review, +25% price, and no retry on a content rejection (credits refunded).
-Hard blocks still apply (minors, real/photorealistic face references,
-graphic violence). Prefer the strict default unless the strict variant
-keeps rejecting legitimate stylistic/adult content.
+**Less-restriction variants** have model-specific pricing and content policies.
+Consult the relevant official endpoint documentation linked in the catalog;
+do not assume one surcharge or reference-image policy applies across models.
+
+Synchronous GPT image calls default to a 120s request timeout, other API calls to 30s,
+and uploads/downloads to 60s. `PIAPI_TIMEOUT_MS` overrides these fetch timeouts.
+`--timeout` instead limits task polling. Generation is not retried automatically.
 
 ### piapi task list
 
@@ -157,7 +156,7 @@ piapi task wait <task-id> --download --timeout 1200
 
 ### piapi task cancel \<id\>
 
-PiAPI has no unified cancel endpoint — only Kling and Midjourney expose
+PiAPI has no unified cancel endpoint. Kling exposes
 per-provider cancel APIs. This command currently surfaces a clear
 "not implemented in v1" hint; cancel via the PiAPI dashboard for now.
 

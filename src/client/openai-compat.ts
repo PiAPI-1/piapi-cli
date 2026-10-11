@@ -9,7 +9,7 @@
 //   https://piapi.ai/docs/gpt-image/gpt-image-api.md
 
 import { APIError } from '../errors/api';
-import { DEFAULT_API_TIMEOUT_MS, resolveTimeout, timeoutSignal } from './timeout';
+import { DEFAULT_API_TIMEOUT_MS, DEFAULT_IMAGE_TIMEOUT_MS, resolveTimeout, timeoutSignal } from './timeout';
 
 export interface OpenAIClient {
   apiKey: string;
@@ -54,7 +54,7 @@ export interface ImageResponse {
   usage?: { input_tokens?: number; output_tokens?: number; total_tokens?: number };
 }
 
-async function postBearer<T>(client: OpenAIClient, path: string, body: unknown): Promise<T> {
+async function postBearer<T>(client: OpenAIClient, path: string, body: unknown, defaultMs: number = DEFAULT_API_TIMEOUT_MS): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`${client.baseUrl}${path}`, {
@@ -64,11 +64,11 @@ async function postBearer<T>(client: OpenAIClient, path: string, body: unknown):
         Authorization: `Bearer ${client.apiKey}`,
       },
       body: JSON.stringify(body),
-      signal: timeoutSignal(DEFAULT_API_TIMEOUT_MS),
+      signal: timeoutSignal(defaultMs),
     });
   } catch (e) {
     if (e instanceof Error && e.name === 'TimeoutError') {
-      throw new APIError(`Request timed out after ${resolveTimeout(DEFAULT_API_TIMEOUT_MS)}ms (set PIAPI_TIMEOUT_MS to override)`, 0, 'TIMEOUT');
+      throw new APIError(`Request timed out after ${resolveTimeout(defaultMs)}ms (set PIAPI_TIMEOUT_MS to override)`, 0, 'TIMEOUT');
     }
     throw e;
   }
@@ -90,7 +90,7 @@ export function chatCompletion(client: OpenAIClient, body: ChatRequest): Promise
 }
 
 export function imageGeneration(client: OpenAIClient, body: ImageRequest): Promise<ImageResponse> {
-  return postBearer<ImageResponse>(client, '/v1/images/generations', body);
+  return postBearer<ImageResponse>(client, '/v1/images/generations', body, DEFAULT_IMAGE_TIMEOUT_MS);
 }
 
 export type ChatUsage = NonNullable<ChatResponse['usage']>;

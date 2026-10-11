@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>piapi — one binary for 97 multimodal AI models</strong><br>
+  <strong>piapi: one binary for 111 multimodal AI catalog entries</strong><br>
   Generate images, videos, audio, 3D, and chat with LLMs from your terminal or AI agent.
 </p>
 
@@ -13,14 +13,16 @@
 
 ## Features
 
-- **Image** — 37 models incl. `flux-dev`, `nano-banana-pro`, `qwen-image-edit`, `seedream-5-pro`, `midjourney`, plus tools (`remove-bg`, `upscale`, `segment`, `joycaption`, `faceswap`)
-- **Video** — 42 models incl. `sora2-pro`, `kling-3`, `veo3-fast`, `wanx22`, `seedance-2`, `hailuo`, `luma`
-- **Audio** — 11 models incl. `mmaudio` (video→audio), `seed-audio`, `f5-tts`, `diffrhythm`, `udio-music`, `ace-step`
-- **3D** — `trellis` (text→3D), `trellis2` (image→3D), `pixal3d` (image→3D)
-- **LLM** — 8 chat models incl. `gpt-4o`, `claude-sonnet-4.6`, `gpt-5`, plus `gpt-image-2` for OpenAI-compatible image generation
+- **Image**: 32 entries including `flux-dev`, `nano-banana-pro`, `qwen-image-edit`, `seedream-5-pro`, GPT Image 2 GA and 2.5, plus image tools
+- **Video**: 50 entries including `sora2-pro`, `kling-3`, `veo3-fast`, `seedance-2.5`, `seedance-2-mini`, and `minimax-h3`
+- **Audio**: 11 entries including `mmaudio`, `seed-audio`, `f5-tts`, `diffrhythm`, `udio-music`, and `ace-step`
+- **3D**: 6 entries including `trellis`, `trellis2`, `pixal3d`, `meshy`, `meshy-txt`, and `skin-tokens`
+- **LLM**: 12 chat entries including `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, and existing GPT, Claude and Gemini models
 - **Streaming** — `--stream` for token-by-token LLM output; SSE-only models (`sora2-preview`) stream by default
-- **File I/O** — `key=@./local.png` auto-uploads, `--download` auto-saves every result URL or `b64_json` payload
-- **Two API surfaces** — Unified task API for media generation, OpenAI-compatible endpoint for LLMs and `gpt-image-2`. Every entry verified against PiAPI docs; `piapi model list` shows the live catalog.
+- **File I/O**: `key=@./local.png` auto-uploads, `--download` saves result URLs and synchronous OpenAI image `b64_json` payloads
+- **Two API surfaces**: unified tasks for media and OpenAI-compatible endpoints for chat and GPT image generation. `piapi model list` shows the bundled, documentation-verified catalog, not a live provider query.
+
+See [the October 11, 2026 upstream update guide](docs/upstream-models.md) for new aliases, compatibility notes, workflow examples and known limitations.
 
 ## Install
 
@@ -73,9 +75,10 @@ piapi model list --type video
 
 ### piapi run \<model\> key=value...
 
-Run any model with `key=value` inputs. Video and 3D models require `--async`.
-LLM and `gpt-image-2` models use the OpenAI-compatible endpoint (sync, no
-polling); everything else uses the unified task API.
+Run any model with `key=value` inputs. Video and 3D unified models return
+an async task ID by default, without requiring `--async`.
+LLM and GPT image generation use synchronous OpenAI-compatible endpoints.
+Other media models use unified tasks, while Sora preview models stream.
 
 ```bash
 piapi run flux-dev prompt="a corgi" aspect_ratio=16:9 num_outputs=4
@@ -101,8 +104,9 @@ piapi run remove-bg image=@./photo.png --download --out-dir ./out
 piapi run faceswap source=@./face.jpg target=@./scene.png --async
 ```
 
-Upload requires a paid PiAPI plan. Add `--download` to save every URL (and
-inline base64 from `gpt-image-2` reference edits) into `--out-dir` (default cwd).
+Upload requires a paid PiAPI plan. Add `--download` to save result URLs and
+synchronous GPT image generation base64 into `--out-dir` (default cwd).
+GPT multipart image editing is not implemented.
 
 ### piapi task
 
@@ -110,7 +114,7 @@ inline base64 from `gpt-image-2` reference edits) into `--out-dir` (default cwd)
 piapi task list
 piapi task get <id>
 piapi task wait <id> --download   # poll until finished, render like a sync run
-piapi task cancel <id>   # provider-specific (Kling/Midjourney only); v1 returns a hint
+piapi task cancel <id>   # provider-specific (Kling only); v1 returns a hint
 ```
 
 ### piapi model
@@ -180,7 +184,7 @@ Precedence: CLI flags → environment variables → config file → defaults.
 |---|---|
 | `PIAPI_API_KEY` | API key |
 | `PIAPI_BASE_URL` | Override API base URL |
-| `PIAPI_TIMEOUT_MS` | Override fetch timeout (default 30s API / 60s upload+download) |
+| `PIAPI_TIMEOUT_MS` | Override fetch timeout (default 120s synchronous images / 30s other API / 60s upload+download) |
 | `PIAPI_NO_UPDATE_CHECK` | Disable the daily npm-version check |
 | `NO_COLOR` | Disable ANSI colors (any truthy value) |
 
