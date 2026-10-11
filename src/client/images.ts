@@ -1,7 +1,7 @@
 // GPT-image endpoints not covered by openai-compat.ts:
 //   - synchronous image edit: POST /v1/images/edits (multipart, Bearer, 120s)
 //   - async submit: POST /api/v1/images/generations/async (JSON) and
-//     /api/v1/images/edits/async (multipart), both X-API-Key, 30s
+//     /api/v1/images/edits/async (multipart), both X-API-Key, 30s JSON / 120s multipart
 //
 // The async API lives on the `/api/v1` prefix (sync is `/v1`) and answers
 // either a raw task shell ({ task_id, status, ... }) or the standard
@@ -59,7 +59,12 @@ export async function imageEdit(client: OpenAIClient, body: ImageRequest): Promi
   if (!res.ok) {
     throw new APIError(await upstreamErrorMessage(res), res.status, String(res.status));
   }
-  return JSON.parse(await res.text()) as ImageResponse;
+  const text = await res.text();
+  try {
+    return JSON.parse(text) as ImageResponse;
+  } catch {
+    throw new APIError(`Unexpected image edit response: invalid JSON (HTTP ${res.status}).`, res.status, String(res.status));
+  }
 }
 
 interface AsyncSubmitEnvelope {
@@ -74,7 +79,8 @@ export async function submitImageTask(
   body: ImageRequest,
   edit: boolean,
 ): Promise<TaskData> {
-  const init: RequestInit = { method: 'POST', signal: timeoutSignal(DEFAULT_API_TIMEOUT_MS) };
+  const defaultTimeout = edit ? DEFAULT_IMAGE_TIMEOUT_MS : DEFAULT_API_TIMEOUT_MS;
+  const init: RequestInit = { method: 'POST' };
   const path = edit ? Endpoints.IMAGE_EDITS_ASYNC : Endpoints.IMAGE_GENERATIONS_ASYNC;
   if (edit) {
     init.headers = { 'X-API-Key': client.apiKey };
@@ -85,11 +91,15 @@ export async function submitImageTask(
     init.body = JSON.stringify(body);
   }
 
+  // Multipart can contain up to 16 x 25 MB references. Start the deadline
+  // after local validation/assembly, and allow upload time before acknowledgement.
+  init.signal = timeoutSignal(defaultTimeout);
+
   let res: Response;
   try {
     res = await fetch(`${client.baseUrl}${path}`, init);
   } catch (e) {
-    if (e instanceof Error && e.name === 'TimeoutError') throw timeoutError(DEFAULT_API_TIMEOUT_MS);
+    if (e instanceof Error && e.name === 'TimeoutError') throw timeoutError(defaultTimeout);
     throw e;
   }
 

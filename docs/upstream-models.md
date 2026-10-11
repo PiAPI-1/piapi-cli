@@ -121,8 +121,9 @@ piapi run meshy-txt mode=refine preview_task_id=PREVIEW_TASK_ID --dry-run
   See [GPT image workflows](image-workflows.md) for endpoint/auth boundaries,
   local-file syntax and task retrieval.
 - Synchronous image requests default to 120s because documented Sunburst
-  generation commonly takes 50-70s. Other API requests remain 30s and transfers
-  60s. `PIAPI_TIMEOUT_MS` overrides fetch limits, not task polling. No automatic
+  generation commonly takes 50-70s. Async multipart image edits use the same
+  deadline, as detailed in [GPT image workflows](image-workflows.md). Other API
+  requests remain 30s and transfers 60s. `PIAPI_TIMEOUT_MS` overrides fetch limits, not task polling. No automatic
   generation retry was added.
 - MiniMax H3's official prose lists 480P/768P/1080P, while its schema lists
   512p/768p. No resolution default is injected until this contradiction is

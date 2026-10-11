@@ -348,8 +348,8 @@ export default defineCommand({
     if (flags.edit && apiType !== 'openai-images') {
       throw new CLIError('--edit only applies to GPT image models.', ExitCode.USAGE);
     }
-    if (apiType === 'openai-images' && flags.webhook && (flags.async || flags.edit)) {
-      throw new CLIError('GPT image edit/async endpoints do not support --webhook.', ExitCode.USAGE);
+    if (apiType === 'openai-images' && flags.webhook) {
+      throw new CLIError('GPT image endpoints do not support --webhook.', ExitCode.USAGE);
     }
     const kvArgs = (flags._positional ?? []).slice(1);
     const userInput = parseInput(kvArgs);

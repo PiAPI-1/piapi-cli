@@ -63,7 +63,8 @@ not wait or download an unfinished result: use `task wait --download` afterward.
 Provider results expire after 60 minutes from submission, so retrieve them promptly.
 The documented in-flight limit is 100 tasks; concurrency errors are surfaced
 rather than automatically resubmitted. Webhook callbacks are not documented for
-these image endpoints, so `--webhook` is rejected for edit/async calls.
+these image endpoints, so `--webhook` is rejected for all GPT image calls,
+including synchronous generation.
 
 Completed tasks may contain URLs or `output.data[].b64_json`. Both download paths
 work in text and JSON output modes. JSON preserves the raw task, while text
@@ -73,8 +74,10 @@ are never overwritten. Base64 payloads use `.png` filenames, so prefer
 A failed image task reports the upstream `output.error_body` message and exits
 with the existing API-error code. Polling failures never resubmit a task.
 
-Sync image generation/edit requests default to 120s. Async submission and task
-queries default to 30s. `PIAPI_TIMEOUT_MS` overrides request timeouts;
+Sync image generation/edit and async multipart edit submissions default to 120s.
+Async JSON generation submissions and task queries default to 30s. The async
+edit deadline starts after local file validation and form assembly so those
+operations do not consume the upload budget. `PIAPI_TIMEOUT_MS` overrides request timeouts;
 `--timeout` controls how long task polling waits. On polling timeout, resume
 using the same task ID rather than submitting the intent again.
 
@@ -94,5 +97,12 @@ with `test.each`: Bun spreads array rows into callback arguments, which can othe
 cause a rejection test to run only the first CLI token and falsely pass. Typecheck
 and exact request-body assertions catch this fixture error.
 These tests do not prove paid upstream generation.
+
+The review-fix regressions in `test/client/images.test.ts` pin the multipart
+deadline separately from JSON submission, require file failures before timeout
+creation, and preserve overrides and single-attempt behavior. They also require
+malformed HTTP 200 edit responses to become descriptive API errors rather than
+raw parsing exceptions. `test/commands/image-run.test.ts` rejects unsupported
+webhooks on synchronous generation as well as edit/async paths, before any POST.
 
 Private Seedance asset-management commands remain outside this package.

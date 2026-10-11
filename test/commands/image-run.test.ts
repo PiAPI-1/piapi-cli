@@ -44,6 +44,8 @@ describe('image edit and async CLI previews', () => {
     ['gpt-6-astra', 'prompt=fixture', '--edit'],
     ['gpt-image-2-ga', 'prompt=fixture', '--edit'],
     ['gpt-image-2-ga', 'prompt=fixture', 'image=https://example.com/a.png', '--edit'],
+    ['gpt-image-2-ga', 'prompt=fixture', '--webhook', 'https://example.com/hook'],
+    ['gpt-image-2-ga', 'prompt=fixture', 'image=@/missing/a.png', '--edit', '--webhook', 'https://example.com/hook'],
     ['gpt-image-2-ga', 'prompt=fixture', '--async', '--webhook', 'https://example.com/hook'],
   ].map(args => ({ args })))('rejects unsupported or malformed edit invocation: %j', ({ args }) => {
     const res = preview(args);

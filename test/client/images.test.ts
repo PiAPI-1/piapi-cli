@@ -77,6 +77,13 @@ describe('imageEdit (sync multipart edit)', () => {
       .rejects.toThrow('upstream boom');
   });
 
+  test.each(['<html>proxy response</html>', ''])('reports malformed HTTP 200 edit bodies as API errors: %j', async body => {
+    const file = fixture('ref.png');
+    spyOn(globalThis, 'fetch').mockResolvedValue(new Response(body, { status: 200 }));
+    await expect(imageEdit(client, { model: 'm', prompt: 'p', image: `@${file}` }))
+      .rejects.toMatchObject({ name: 'APIError', statusCode: 200, message: 'Unexpected image edit response: invalid JSON (HTTP 200).' });
+  });
+
   test('fails on a missing local file before any fetch', async () => {
     const fetchSpy = spyOn(globalThis, 'fetch');
     await expect(imageEdit(client, { model: 'm', prompt: 'p', image: `@${join(dir, 'gone.png')}` }))
@@ -123,8 +130,9 @@ describe('submitImageTask (async submit)', () => {
     expect(timeout).toHaveBeenCalledWith(30_000);
   });
 
-  test('edits: POSTs multipart to /api/v1/images/edits/async with X-API-Key and no Bearer', async () => {
+  test('edits: POSTs multipart to /api/v1/images/edits/async with X-API-Key and a 120s timeout', async () => {
     const file = fixture('ref.png', 'PNG-BYTES');
+    const timeout = spyOn(AbortSignal, 'timeout');
     const fetchSpy = spyOn(globalThis, 'fetch').mockResolvedValue(
       Response.json({ task_id: 'task-2', status: 'pending' }),
     );
@@ -138,6 +146,33 @@ describe('submitImageTask (async submit)', () => {
     expect(headers.get('authorization')).toBeNull();
     expect(headers.get('content-type')).toBeNull(); // multipart boundary set by fetch
     expect(await ((init.body as FormData).get('image') as File).text()).toBe('PNG-BYTES');
+    expect(timeout).toHaveBeenCalledWith(120_000);
+  });
+
+  test('starts the async edit timeout only after local validation succeeds', async () => {
+    const timeout = spyOn(AbortSignal, 'timeout');
+    const fetchSpy = spyOn(globalThis, 'fetch');
+    await expect(submitImageTask(client, { model: 'm', prompt: 'p', image: `@${join(dir, 'missing.png')}` }, true))
+      .rejects.toThrow(/not found/i);
+    expect(timeout).not.toHaveBeenCalled();
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  test('honours the async edit timeout override without retrying', async () => {
+    process.env.PIAPI_TIMEOUT_MS = '4321';
+    const file = fixture('ref.png');
+    const timeout = spyOn(AbortSignal, 'timeout');
+    const fetchSpy = spyOn(globalThis, 'fetch').mockRejectedValue(new DOMException('fixture timeout', 'TimeoutError'));
+    await expect(submitImageTask(client, { model: 'm', prompt: 'p', image: `@${file}` }, true)).rejects.toThrow(/4321ms/);
+    expect(timeout).toHaveBeenCalledWith(4321);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('does not retry a timed-out async edit and reports its default deadline', async () => {
+    const file = fixture('ref.png');
+    const fetchSpy = spyOn(globalThis, 'fetch').mockRejectedValue(new DOMException('fixture timeout', 'TimeoutError'));
+    await expect(submitImageTask(client, { model: 'm', prompt: 'p', image: `@${file}` }, true)).rejects.toThrow(/120000ms/);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 
   test('unwraps the { code, message, data } envelope', async () => {

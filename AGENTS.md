@@ -117,7 +117,7 @@ const apiKey = resolveAPIKey(flags.apiKey) ?? config.apiKey;
 - 配置：CLI flag → `PIAPI_API_KEY` env → `~/.piapi/config.json` → 默认。优先级在 `src/auth/resolver.ts`
 - `auth status` 等命令必须用已解析的 `config.apiKey`，**不要**重读文件（否则 `--api-key` 不生效）
 - 配置解析失败时打 stderr 一次警告 + 降级 `{}`（不静默吞）：`src/config/loader.ts`
-- 所有 fetch 走 `AbortSignal.timeout()`：synchronous images 120s / other API 30s / 上传下载 60s / 流式不超时。`PIAPI_TIMEOUT_MS` 覆盖。`src/client/timeout.ts`
+- Fetch deadlines use `AbortSignal.timeout()`: synchronous images and async multipart image edits 120s / other API 30s / uploads and downloads 60s / streams have no deadline. `PIAPI_TIMEOUT_MS` overrides defaults. Constants: `src/client/timeout.ts`; image workflow and regression evidence: `docs/image-workflows.md`.
 
 ## 发布前检查
 
