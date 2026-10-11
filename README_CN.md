@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>piapi — 一个二进制，111 个多模态 AI 模型</strong><br>
+  <strong>piapi: one binary for 111 multimodal AI catalog entries</strong><br>
   在终端或 AI Agent 中生成图像、视频、音频、3D，以及与 LLM 对话。
 </p>
 
