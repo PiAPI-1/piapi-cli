@@ -124,7 +124,7 @@ const apiKey = resolveAPIKey(flags.apiKey) ?? config.apiKey;
 1. `bun run typecheck && bun run lint && bun test && bun run build` 全绿
 2. `./dist/piapi.mjs --version` 输出当前 `package.json` 版本（不是 `0.0.0-dev`）
 3. `npm pack --dry-run` 只 4 文件：LICENSE / README.md / dist/piapi.mjs / package.json
-4. tag `v*` 触发 `.github/workflows/release.yml` → npm publish 先跑，成功后才建 GH Release（需要 repo `NPM_TOKEN` secret）
+4. The legacy tag-triggered `release.yml` directly publishes to npm before creating a GitHub Release and requires `NPM_TOKEN` with direct-publish permission. Stage-only tokens must use the approved manual `v0.4.0` workflow and maintainer approval described in `docs/staged-release.md`.
 5. 推 tag 后**必须**核 `npm view piapi-cli version`。workflow 绿 ≠ 发布成功，见「已知坑」
 
 ## Upstream contract evidence
