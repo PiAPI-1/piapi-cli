@@ -1,6 +1,6 @@
 {
   "name": "piapi-cli",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Official CLI for the PiAPI platform: call 111 multimodal AI catalog entries (image, video, audio, 3D, LLM) from your terminal or AI agent",
   "type": "module",
   "engines": {
